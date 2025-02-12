@@ -1,0 +1,19 @@
+{
+  "editProfile": "تعديل الملف الشخصي",
+  "done": "تم",
+  "changeProfilePhoto": "تغيير صورة الملف الشخصي",
+  "name": "الاسم",
+  "username": "اسم المستخدم",
+  "website": "الموقع الإلكتروني",
+  "bio": "السيرة الذاتية",
+  "switchToProfessionalAccount": "التبديل إلى حساب احترافي",
+  "privateInformation": "معلومات خاصة",
+  "email": "البريد الإلكتروني",
+  "phone": "رقم الهاتف",
+  "gender": "الجنس",
+  "home": "الرئيسية",
+  "login": "تسجيل الدخول",
+  "password": "كلمة المرور",
+  "doNotHaveAnEmail": "لا تملك بريدًا إلكترونيًا؟",
+  "register": "التسجيل"
+}

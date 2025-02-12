@@ -28,7 +28,6 @@ ThemeData darkMode = ThemeData(
 
 class ThemeProvider with ChangeNotifier {
   ThemeData _themeData = lightMode;
-
   ThemeData get themeData => _themeData;
 
   set themeData(ThemeData themeData) {

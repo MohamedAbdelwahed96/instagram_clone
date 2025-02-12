@@ -1,0 +1,19 @@
+{
+  "editProfile": "Edit Profile",
+  "done": "Done",
+  "changeProfilePhoto": "Change Profile Photo",
+  "name": "Name",
+  "username": "Username",
+  "website": "Website",
+  "bio": "Bio",
+  "switchToProfessionalAccount": "Switch to Professional Account",
+  "privateInformation": "Private Information",
+  "email": "Email",
+  "phone": "Phone",
+  "gender": "Gender",
+  "home": "Home",
+  "login": "Login",
+  "password": "Password",
+  "doNotHaveAnEmail": "Do not have an email?",
+  "register": "Register"
+}

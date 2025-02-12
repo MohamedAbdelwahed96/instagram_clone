@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/data/user_model.dart';
+import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 import 'package:instagram_clone/presentation/widgets/post_widget.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
