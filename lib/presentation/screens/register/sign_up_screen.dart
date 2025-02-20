@@ -1,15 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/core/theme.dart';
-import 'package:instagram_clone/data/user_model.dart';
-import 'package:instagram_clone/logic/image_provider.dart';
-import 'package:instagram_clone/logic/user_provider.dart';
-import 'package:instagram_clone/presentation/screens/login_screen.dart';
-import 'package:instagram_clone/presentation/widgets/button_widget.dart';
-import 'package:instagram_clone/presentation/widgets/choose_image_widget.dart';
-import 'package:instagram_clone/presentation/widgets/navigation_bot_bar.dart';
-import 'package:instagram_clone/presentation/widgets/text_formfield_widget.dart';
+import '/data/user_model.dart';
+import '/logic/media_provider.dart';
+import '/logic/user_provider.dart';
+import '/presentation/screens/login_screen.dart';
+import '/presentation/widgets/button_widget.dart';
+import '/presentation/widgets/floating_button_widget.dart';
+import '/presentation/widgets/navigation_bot_bar.dart';
+import '/presentation/widgets/text_formfield_widget.dart';
 import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -20,17 +22,19 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passController = TextEditingController();
-  TextEditingController ageController = TextEditingController();
-  TextEditingController userNameController = TextEditingController();
-  TextEditingController fullNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController(),
+      passController = TextEditingController(),
+      ageController = TextEditingController(),
+      userNameController = TextEditingController(),
+      fullNameController = TextEditingController();
+  UserModel? userModel;
 
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (userContext, userProvider, user_){
-      return Consumer<ImagProvider>(builder: (imgContext, imgProvider, img_){
+      return Consumer<MediaProvider>(builder: (imgContext, imgProvider, img_){
         return Scaffold(
+          floatingActionButton: FloatingButtonWidget(),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -50,56 +54,54 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     TextFormfieldWidget(hintText: "username", controller: userNameController),
                     SizedBox(height: 21),
                     TextFormfieldWidget(hintText: "Full Name", controller: fullNameController),
-                    SizedBox(height: 21),
                     InkWell(
                       onTap: (){
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return ChooseImageWidget();
-                          },
-                        );
+                        imgProvider.selectMedia(FileType.image);
                       },
-                      child: Column(
-                        children: [
-                          CircleAvatar(radius: 60,
-                              backgroundColor: Theme.of(imgContext).colorScheme.inversePrimary,
-                              foregroundImage: imgProvider.ImageFile==null?null:FileImage(imgProvider.ImageFile!),
-                              child: Image.asset("assets/icons/pfp.png", color: Theme.of(context).colorScheme.primary,)),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 21),
+                        child: CircleAvatar(radius: 60,
+                            backgroundColor: Theme.of(imgContext).colorScheme.inversePrimary,
+                            foregroundImage: imgProvider.mediaFile==null?null:FileImage(File(imgProvider.mediaFile!.path!)),
+                            child: Image.asset("assets/icons/pfp.png", color: Theme.of(context).colorScheme.primary)),
                       ),
                     ),
-                    SizedBox(height: 21),
                     InkWell(
                       onTap: () async{
+                        await imgProvider.uploadImage(context);
                         final email = emailController.text.trimRight(),
                             pass = passController.text,
                             userName = userNameController.text,
                             fullName= fullNameController.text,
                             pfpUrl=imgProvider.filename;
-            
-                        if(await userProvider.signUp(userContext, UserModel(
-                            username: userName, fullName: fullName, pfpUrl: pfpUrl.toString(), email: email, time: DateTime.now()),
-                            email, pass)) {
-                          imgProvider.uploadImage(context);
-                          Navigator.pushReplacement(userContext, CupertinoPageRoute(builder: (context) => NavigationBotBar()));
-                        }
+                        await userProvider.signUp(context, UserModel(
+                                username: userName,
+                                fullName: fullName,
+                                email: email,
+                                gender: "Male",
+                                pfpUrl: pfpUrl!,
+                                time: DateTime.now()),
+                            pass);
+                        userProvider.isLogged?Navigator.pushReplacement(context, CupertinoPageRoute(
+                            builder: (context) => NavigationBotBar())):null;
                       },
                       child: ButtonWidget(text: "Register"),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Already have an email?",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 13,
-                              color: Theme.of(userContext).colorScheme.secondary),
-                        ),
-                        TextButton(onPressed: () {
-                          Navigator.pushReplacement(userContext, MaterialPageRoute(builder: (context) => LoginScreen(),),);
-                        }, child: Text("Login."))
-                      ],
+                    SizedBox(height: 21),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Already have an email?  ',
+                            style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13, color: Theme.of(context).colorScheme.secondary),
+                          ),
+                          TextSpan(
+                            text: 'Login.',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                            recognizer: TapGestureRecognizer()..onTap = () => Navigator.pushReplacement(userContext, MaterialPageRoute(builder: (context) => LoginScreen(),),),
+                          ),
+                        ],
+                      ),
                     )
                   ],
                 ),

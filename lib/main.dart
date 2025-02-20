@@ -1,16 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/presentation/screens/login_screen.dart';
+import 'package:instagram_clone/logic/chat_provider.dart';
 import 'package:instagram_clone/presentation/screens/splash_screen.dart';
-import 'package:instagram_clone/presentation/widgets/navigation_bot_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/theme.dart';
 import 'firebase_options.dart';
-import 'logic/image_provider.dart';
+import 'logic/media_provider.dart';
 import 'logic/user_provider.dart';
 
 void main() async{
@@ -27,7 +25,8 @@ void main() async{
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
-        ChangeNotifierProvider(create: (context) => ImagProvider()),
+        ChangeNotifierProvider(create: (context) => MediaProvider()),
+        ChangeNotifierProvider(create: (context) => ChatProvider())
       ],
       child: EasyLocalization(
           supportedLocales: [Locale('en'), Locale('ar')],
@@ -43,7 +42,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<UserProvider>(context, listen: false).getUserInfo();
+    // Provider.of<UserProvider>(context, listen: false).getUserInfo();
     return MaterialApp(
         title: 'Instagram',
         debugShowCheckedModeBanner: false,

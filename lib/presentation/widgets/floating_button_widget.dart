@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../core/theme.dart';
 
 class FloatingButtonWidget extends StatefulWidget {
   const FloatingButtonWidget({super.key});
@@ -23,14 +26,19 @@ class _FloatingButtonWidgetState extends State<FloatingButtonWidget> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   ListTile(
-                    onTap: (){context.setLocale(Locale("en"));},
+                    onTap: ()=> context.setLocale(Locale("en")),
                     leading: Text("EN"),
                     title: Text("English"),
                   ),
                   ListTile(
-                    onTap: (){context.setLocale(Locale("ar"));},
+                    onTap: ()=> context.setLocale(Locale("ar")),
                     leading: Text("AR"),
                     title: Text("Arabic"),
+                  ),
+                  ListTile(
+                    onTap: ()=> Provider.of<ThemeProvider>(context, listen: false).toggleTheme(),
+                    leading: Text("Theme"),
+                    title: Text("Change theme"),
                   ),
                 ],
               ),
@@ -41,7 +49,7 @@ class _FloatingButtonWidgetState extends State<FloatingButtonWidget> {
     },
       // backgroundColor: Colors.white,
       child: Icon(Icons.language,
-          // color: Colors.black
+        // color: Colors.black
       ),
     );
   }
