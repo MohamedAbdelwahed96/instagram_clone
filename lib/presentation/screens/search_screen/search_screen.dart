@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
-import 'package:instagram_clone/presentation/screens/search_screen/posts_widget.dart';
+import 'package:instagram_clone/presentation/screens/search_screen/posts_results.dart';
 import 'package:instagram_clone/presentation/screens/search_screen/users_results.dart';
 import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 import 'package:provider/provider.dart';
@@ -15,13 +16,19 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  TextEditingController _controller = TextEditingController();
+  final formControllers = FormControllers();
   List<UserModel>? users;
 
   @override
   void initState() {
     super.initState();
     Provider.of<UserProvider>(context, listen: false).getAllPosts();
+  }
+
+  @override
+  void dispose() {
+    formControllers.dispose();
+    super.dispose();
   }
 
   @override
@@ -37,12 +44,15 @@ class _SearchScreenState extends State<SearchScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                 child: TextFormField(
-                  controller: _controller,
+                  controller: formControllers.search,
                   style: TextStyle(color: theme.primary),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: theme.inversePrimary,
                     prefixIcon: Padding(padding: const EdgeInsets.all(16), child: IconsWidget(icon: "search")),
+                    suffixIcon: formControllers.search.text.isEmpty?null:IconButton(
+                      onPressed: ()=> setState(() => formControllers.search.clear()),
+                      icon: Icon(Icons.clear),),
                     hintText: "Search",
                     hintStyle: TextStyle(
                         fontSize: 15,
@@ -54,37 +64,28 @@ class _SearchScreenState extends State<SearchScreen> {
                         borderRadius: BorderRadius.circular(10)),
                   ),
                   onFieldSubmitted: (v) async =>
-                  users = await provider.searchUsers(context, _controller.text),
+                  users = await provider.searchUsers(context, formControllers.search.text),
                 ),
               ),
-              _controller.text.isEmpty?
-                  Expanded(
-                    child: StaggeredGrid.count(
-                      crossAxisCount: 4,
-                      mainAxisSpacing: 8,
-                      crossAxisSpacing: 8,
-                      children: List.generate(10, (index) {
-                        return StaggeredGridTile.count(
-                          crossAxisCellCount: index.isEven ? 2 : 1,
-                          mainAxisCellCount: index.isEven ? 2 : 1,
-                          child: Container(
-                            color: Colors.blueAccent,
-                            child: Center(
-                              child: Text(
-                                'Tile $index',
-                                style: TextStyle(color: Colors.white, fontSize: 18),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
+              if (formControllers.search.text.isEmpty)
+                Expanded(
+                    child: MasonryGridView.builder(
+                      itemCount: provider.posts.length,
+                      gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+                      mainAxisSpacing: 2,
+                      crossAxisSpacing: 2,
+                      itemBuilder: (context, index){
+                        final reversedIndex = provider.posts.length - 1 - index;
+                        final post = provider.posts[reversedIndex];
+                        return PostsResults(model: post);
+                      },
                     ))
-                  // :users==null?Center(child: CircularProgressIndicator())
-                  :users!.isEmpty?Padding(
+              else if (users!.isEmpty)
+                Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 28),
-                    child: Text("No results found for ${_controller.text}"),
-                  ):
-              Expanded(
+                    child: Text("No results found for ${formControllers.search.text}"),)
+              else
+                Expanded(
                   child: ListView.builder(
                       itemCount: users!.length,
                       itemBuilder: (context, index){

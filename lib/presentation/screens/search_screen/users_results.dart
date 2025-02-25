@@ -38,7 +38,7 @@ void didUpdateWidget(covariant UsersResults oldWidget) {
 
   @override
   Widget build(BuildContext context) {
-    if(userImg!=null){
+    if(userImg==null){
       return SkeletonSearchUsers();
     }
     return InkWell(

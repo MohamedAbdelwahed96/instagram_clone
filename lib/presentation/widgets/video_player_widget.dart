@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/core/controllers.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
@@ -13,48 +14,53 @@ class VideoPlayerWidget extends StatefulWidget {
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  late VideoPlayerController _controller;
+  final formControllers = FormControllers();
 
   @override
   void initState() {
     super.initState();
     if (widget.videoFile != null) {
-      _controller = VideoPlayerController.file(widget.videoFile!);
+      formControllers.video = VideoPlayerController.file(widget.videoFile!);
     } else if (widget.videoUrl != null) {
-      _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!));
+      formControllers.video = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!));
     }
-    _controller.initialize().then((_) {
-        setState(() {});
-      });
+    formControllers.video.initialize().then((_) => setState(() {}));
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    formControllers.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _controller.value.isInitialized
+    return formControllers.video.value.isInitialized
         ? Stack(
       alignment: Alignment.center,
       children: [
-        AspectRatio(
-          aspectRatio: _controller.value.aspectRatio,
-          child: VideoPlayer(_controller),
+        Container(
+          width: double.infinity, // Makes it fill the width
+          height: double.infinity,
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+                width: formControllers.video.value.size.width,
+                height: formControllers.video.value.size.height,
+                child: VideoPlayer(formControllers.video)),
+          ),
         ),
         Positioned(
           bottom: 10,
           right: 10,
           child: IconButton(
             icon: Icon(
-              _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+              formControllers.video.value.isPlaying ? Icons.pause : Icons.play_arrow,
               color: Colors.white,
             ),
             onPressed: () {
               setState(() {
-                _controller.value.isPlaying ? _controller.pause() : _controller.play();
+                formControllers.video.value.isPlaying ? formControllers.video.pause() : formControllers.video.play();
               });
             },
           ),

@@ -1,14 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '/data/post_model.dart';
 import '/data/user_model.dart';
 import 'package:instagram_clone/presentation/widgets/scaffold_msg.dart';
 
-class UserProvider with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _store = FirebaseFirestore.instance;
+class UserProvider extends ChangeNotifier {
+  final _auth = FirebaseAuth.instance;
+  final _store = FirebaseFirestore.instance;
   User? get currentUser => _auth.currentUser;
   List <PostModel> posts=[];
 
@@ -48,9 +47,13 @@ class UserProvider with ChangeNotifier {
     showScaffoldMSG(context, "Signed out Successfully!");
   }
 
+  UserModel? _userData;
+  UserModel? get userData => _userData;
+
   Future<UserModel?> getUserInfo(String userID) async {
     try {
       final userData = await _store.collection("users").doc(userID).get();
+
       return UserModel.fromMap(userData.data() as Map<String, dynamic>);
     } catch (e) {
       print("Something went wrong: ${e.toString()}");
@@ -137,6 +140,41 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  // Future<bool> checkSave({required String userID, required String postID}) async{
+  //   final response = await _store.collection("posts").doc(postID).get();
+  //
+  //   if ((response.data() as dynamic)["saves"].contains(userID)) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
+  //
+  // Future savePost({required String userID, required String postID}) async{
+  //   try{
+  //     final response = await _store.collection("posts").doc(postID).get();
+  //
+  //     if((response.data() as dynamic)["saves"].contains(userID)){
+  //       await _store.collection("posts").doc(postID).update({"saves":FieldValue.arrayRemove([userID])});
+  //     } else {
+  //       await _store.collection("posts").doc(postID).update({"saves":FieldValue.arrayUnion([userID])});
+  //     } notifyListeners();
+  //   }
+  //   catch(e){
+  //     print("Something went wrong: ${e.toString()}");
+  //   }
+  // }
+
+  Future setLanguage({required String userID, required String language}) async{
+    await _store.collection("users").doc(userID).update({"language": language});
+    notifyListeners();
+  }
+
+  Future setTheme({required String userID, required bool theme}) async{
+    await _store.collection("users").doc(userID).update({"darkTheme": theme});
+    notifyListeners();
+  }
+
   Future<PostModel?> getPostInfo(String postID) async {
     try {
       final postData = await _store.collection("posts").doc(postID).get();
@@ -159,4 +197,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
     return response.docs.map((e)=>UserModel.fromMap(e.data())).toList();
   }
+
+  String chatId(String userId) => currentUser!.uid.compareTo(userId) < 0 ?
+    "${currentUser!.uid}\_$userId" : "$userId\_${currentUser!.uid}";
 }

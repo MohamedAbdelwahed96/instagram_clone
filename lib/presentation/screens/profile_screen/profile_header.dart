@@ -91,13 +91,17 @@ class _ProfileHeaderState extends State<ProfileHeader> {
               isFollowing ? Expanded(
                 flex: 1,
                 child: InkWell(
-                    onTap: (){},
+                    onTap: (){
+                      final thisUser = provider.currentUser!.uid;
+                      final id = provider.chatId(widget.profileID);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                          ChatScreen(chatId: id, currentUserId: thisUser, user: user,)));
+                    },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: Color.fromRGBO(239, 239, 239, 0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                        borderRadius: BorderRadius.circular(8)),
                       alignment: Alignment.center,
                       child: Text('Message' , style: TextStyle(color: theme.primary)),
                     )
@@ -194,9 +198,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
             ? Expanded(
           flex: 1,
           child: InkWell(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chatId: "10203040")));
-            },
+            onTap: () {},
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(

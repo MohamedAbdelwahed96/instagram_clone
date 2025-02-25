@@ -64,7 +64,8 @@ class MediaProvider extends ChangeNotifier{
     }
   }
 
-  Future<String> getImage({required String bucketName, required String folderName, required String fileName}) async {
+  Future<String> getImage({
+    required String bucketName, required String folderName, required String fileName}) async {
     try {
       String img = await _supa.from(bucketName).getPublicUrl("$folderName/$fileName");
       return img;

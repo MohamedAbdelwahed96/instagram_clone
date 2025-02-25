@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/presentation/screens/new_post.dart';
 import 'package:instagram_clone/presentation/skeleton_loading/home_screen_loading.dart';
 import 'package:provider/provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
@@ -43,7 +44,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(width: 24),
                   IconsWidget(icon: "chat"),
                   SizedBox(width: 24),
-                  IconsWidget(icon: "new_story"),
+                  IconsWidget(icon: "new_story", onTap: ()=>
+                          Navigator.push(context,MaterialPageRoute(builder: (context) => NewPostScreen()),),),
                 ],
               ),
             ),

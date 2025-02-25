@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/presentation/widgets/navigation_bot_bar.dart';
 import 'package:instagram_clone/presentation/widgets/scaffold_msg.dart';
@@ -20,8 +21,7 @@ class NewPostScreen extends StatefulWidget {
 }
 
 class _NewPostScreenState extends State<NewPostScreen> {
-  final TextEditingController _captionController = TextEditingController();
-  PageController _pageController = PageController();
+  final formControllers = FormControllers();
   UserModel? user;
   bool _isUploading = false;
 
@@ -35,6 +35,12 @@ class _NewPostScreenState extends State<NewPostScreen> {
     final usr = Provider.of<UserProvider>(context, listen: false);
     UserModel? fetchedUser = await usr.getUserInfo(usr.currentUser!.uid);
     setState(() => user = fetchedUser);
+  }
+
+  @override
+  void dispose() {
+    formControllers.dispose();
+    super.dispose();
   }
 
   @override
@@ -72,7 +78,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                           icon: Icon(Icons.add_a_photo, size: 50, color: Theme.of(context).colorScheme.secondary)),
                         ) :
                     PageView.builder(
-                        controller: _pageController,
+                        controller: formControllers.page,
                         itemCount: provider.mediaFiles.length,
                         itemBuilder: (context, index) {
                           final file = provider.mediaFiles[index];
@@ -91,7 +97,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   child: TextField(
-                    controller: _captionController,
+                    controller: formControllers.caption,
                     decoration: InputDecoration(
                       hintText: "Write a caption...",
                       border: OutlineInputBorder(),
@@ -117,7 +123,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             username: user!.username,
                             userProfileImage: user!.pfpUrl,
                             mediaUrls: provider.media,
-                            caption: _captionController.text,
+                            caption: formControllers.caption.text,
                             createdAt: DateTime.now(),
                             likes: [],
                             commentCount: 0)

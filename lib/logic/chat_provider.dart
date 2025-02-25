@@ -3,33 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/chat_model.dart';
 
 class ChatProvider extends ChangeNotifier {
-  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref("chats").child("path");
-  final List<ChatModel> _messages = [];
-  List<ChatModel> get messages => _messages;
+  final _dbRef = FirebaseDatabase.instance.ref();
+  final Map<String, List<ChatModel>> chats = {};
 
-  ChatProvider() {
-    _loadMessages();
-  }
-
-  void _loadMessages() {
-    _dbRef.onChildAdded.listen((event) {
-      final data = event.snapshot.value as Map<dynamic, dynamic>;
-      _messages.add(ChatModel.fromMap(Map<String, dynamic>.from(data)));
-      notifyListeners();
+  Future getMessages(String chatId) async {
+    _dbRef.child("chats/$chatId/messages").onValue.listen((event) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>?;
+      if (data != null) {
+        chats[chatId] = data.entries.map((entry) =>
+            ChatModel.fromMap(Map<String, dynamic>.from(entry.value))).toList()
+          ..sort((a, b) => b.timeSent.compareTo(a.timeSent));
+        notifyListeners();
+      }
     });
   }
 
-  void sendMessage(String message) {
-    final newMessage = ChatModel(
-      id: DateTime.now().toString(),
-      message: message,
-      isMe: true,
-      timestamp: DateTime.now(),
-    );
-    _dbRef.push().set(newMessage.toMap());
+  Future sendMessage(ChatModel message) async {
+    final msg = _dbRef.child("chats/${message.chatId}/messages").push();
+    await msg.set(message.toMap());
+    await msg.update({"messageId": msg.key});
   }
-  //
-  // List<ChatModel> getMessages() {
-  //   return List.from(_messages);
-  // }
+
+  Future deleteMessage(String chatId, String msgId) async {
+    await _dbRef.child("chats/$chatId/messages/$msgId").remove();
+    chats[chatId]?.removeWhere((msg) => msg.messageId == msgId);
+    notifyListeners();
+  }
 }

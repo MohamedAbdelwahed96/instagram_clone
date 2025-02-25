@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/core/colors.dart';
 
 class ButtonWidget extends StatefulWidget {
   final String text;
@@ -16,7 +17,7 @@ class _ButtonWidgetState extends State<ButtonWidget> {
       height: MediaQuery.of(context).size.height*0.06,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
-        color: widget.isEnabled?Color.fromRGBO(0, 163, 255, 1):Color.fromRGBO(0, 163, 255, 0.5),
+        color: widget.isEnabled?ColorsManager.enabledButton:ColorsManager.disabledButton,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Center(

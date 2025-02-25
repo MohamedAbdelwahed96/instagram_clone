@@ -9,6 +9,8 @@ import 'package:instagram_clone/presentation/screens/profile_screen/profile_scre
 import 'package:instagram_clone/presentation/widgets/video_player_widget.dart';
 import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
+
 
 import 'icons_widget.dart';
 
@@ -168,7 +170,8 @@ class _PostWidgetState extends State<PostWidget> {
                             ),
                           ],
                         ),
-                      )
+                      ),
+                      Text(timeago.format(widget.model.createdAt), style: TextStyle(color: theme.primary.withOpacity(0.5)),)
                     ],
                   ),
                 ),

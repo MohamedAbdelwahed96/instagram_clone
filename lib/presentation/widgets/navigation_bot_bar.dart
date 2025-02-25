@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
-import 'package:instagram_clone/presentation/screens/chat_screen.dart';
 import 'package:instagram_clone/presentation/screens/search_screen/search_screen.dart';
 import 'package:provider/provider.dart';
 import '/presentation/widgets/floating_button_widget.dart';
@@ -39,8 +39,14 @@ class _NavigationBotBarState extends State<NavigationBotBar> {
     });
   }
 
+  @override
+  void dispose() {
+    formControllers.dispose();
+    super.dispose();
+  }
+
   int _selectedPageIndex = 0;
-  final PageController _controller = PageController(initialPage: 0);
+  final formControllers = FormControllers();
 
   @override
   Widget build(BuildContext context) {
@@ -49,15 +55,15 @@ class _NavigationBotBarState extends State<NavigationBotBar> {
         return Center(child: CircularProgressIndicator());
       }
       return Scaffold(
-        // floatingActionButton: FloatingButtonWidget(),
+        floatingActionButton: FloatingButtonWidget(),
         body: PageView(
-            controller: _controller,
+            controller: formControllers.page,
             onPageChanged: (index)=> setState(() => _selectedPageIndex=index),
             scrollDirection: Axis.horizontal,
             children: [
               HomeScreen(),
               SearchScreen(),
-              ChatScreen(chatId: "10203040"),
+              NewPostScreen(),
               ProfileScreen(profileID: "ZRtVkyk9d5YXEqhuVgCj3Esja8v2"),
               ProfileScreen(profileID: user!.uid)
             ]),
@@ -71,7 +77,7 @@ class _NavigationBotBarState extends State<NavigationBotBar> {
               showSelectedLabels: false,
               showUnselectedLabels: false,
               currentIndex: _selectedPageIndex,
-              onTap: (index) => _controller.animateToPage(index, duration: Duration(milliseconds: 100), curve: Curves.ease),
+              onTap: (index) => formControllers.page.animateToPage(index, duration: Duration(milliseconds: 100), curve: Curves.ease),
               items: [
                 BottomNavigationBarItem(icon: IconsWidget(icon: _selectedPageIndex==0?"home_bold":"home"), label: ""),
                 BottomNavigationBarItem(icon: IconsWidget(icon: _selectedPageIndex==1?"search_bold":"search"), label: ""),

@@ -4,6 +4,7 @@ import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/new_post.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_header.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_posts.dart';
+import 'package:instagram_clone/presentation/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -59,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             IconButton(
               icon: Icon(Icons.menu),
-              onPressed: () {},
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>SettingsScreen())),
             ),
           ],
         ),

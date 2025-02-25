@@ -12,8 +12,9 @@ class UserModel {
   final String gender;
   final String website;
   final DateTime time;
+  final bool darkTheme;
+  final String language;
 
-  // Constructor
   UserModel({
     this.uid = "",
     required this.username,
@@ -28,9 +29,10 @@ class UserModel {
     required this.gender,
     this.website = "",
     required this.time,
+    this.darkTheme = false,
+    this.language = "en",
   });
 
-  // Convert Firestore Map to UserModel
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       uid: map['uid'] ?? '',
@@ -38,24 +40,19 @@ class UserModel {
       fullName: map['fullName'] ?? '',
       pfpUrl: map['pfpUrl'] ?? '',
       email: map['email'] ?? '',
-      followers: map['followers'] != null
-          ? List<String>.from(map['followers']) // If 'followers' is an array
-          : [],
-      following: map['following'] != null
-          ? List<String>.from(map['following']) // If 'following' is an array
-          : [],
-      posts: map['posts'] != null
-          ? List<String>.from(map['posts']) // If 'posts' is an array
-          : [],
+      followers: map['followers'] != null ? List<String>.from(map['followers']) : [],
+      following: map['following'] != null ? List<String>.from(map['following']) : [],
+      posts: map['posts'] != null ? List<String>.from(map['posts']) : [],
       bio: map['bio'] ?? '',
       pNumber: map['pNumber'] ?? '',
       gender: map['gender'] ?? '',
       website: map['website'] ?? '',
       time: map['time'] != null ? DateTime.parse(map['time']) : DateTime.now(),
+      darkTheme: map['darkTheme'] ?? false,
+      language: map['language'] ?? 'en',
     );
   }
 
-  // Convert UserModel to Firestore Map
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -63,14 +60,16 @@ class UserModel {
       'fullName': fullName,
       'pfpUrl': pfpUrl,
       'email': email,
-      'followers': followers, // Firestore will handle it as an array
-      'following': following, // Firestore will handle it as an array
-      'posts': posts, // Firestore will handle it as an array
+      'followers': followers,
+      'following': following,
+      'posts': posts,
       'bio': bio,
       'pNumber': pNumber,
       'gender': gender,
       'website': website,
-      'time': time.toIso8601String(), // Convert DateTime to a string
+      'time': time.toIso8601String(),
+      'darkTheme': darkTheme,
+      'language': language,
     };
   }
 }
