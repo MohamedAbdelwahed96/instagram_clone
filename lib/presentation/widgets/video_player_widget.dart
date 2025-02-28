@@ -14,28 +14,28 @@ class VideoPlayerWidget extends StatefulWidget {
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  final formControllers = FormControllers();
+  late final VideoPlayerController video;
 
   @override
   void initState() {
     super.initState();
     if (widget.videoFile != null) {
-      formControllers.video = VideoPlayerController.file(widget.videoFile!);
+      video = VideoPlayerController.file(widget.videoFile!);
     } else if (widget.videoUrl != null) {
-      formControllers.video = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!));
+      video = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!));
     }
-    formControllers.video.initialize().then((_) => setState(() {}));
+    video.initialize().then((_) => setState(() {}));
   }
 
   @override
   void dispose() {
-    formControllers.dispose();
+    video.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return formControllers.video.value.isInitialized
+    return video.value.isInitialized
         ? Stack(
       alignment: Alignment.center,
       children: [
@@ -43,11 +43,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           width: double.infinity, // Makes it fill the width
           height: double.infinity,
           child: FittedBox(
-            fit: BoxFit.cover,
+            fit: BoxFit.fitWidth,
             child: SizedBox(
-                width: formControllers.video.value.size.width,
-                height: formControllers.video.value.size.height,
-                child: VideoPlayer(formControllers.video)),
+                width: video.value.size.width,
+                height: video.value.size.height,
+                child: VideoPlayer(video)),
           ),
         ),
         Positioned(
@@ -55,12 +55,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           right: 10,
           child: IconButton(
             icon: Icon(
-              formControllers.video.value.isPlaying ? Icons.pause : Icons.play_arrow,
+              video.value.isPlaying ? Icons.pause : Icons.play_arrow,
               color: Colors.white,
             ),
             onPressed: () {
               setState(() {
-                formControllers.video.value.isPlaying ? formControllers.video.pause() : formControllers.video.play();
+                video.value.isPlaying ? video.pause() : video.play();
               });
             },
           ),

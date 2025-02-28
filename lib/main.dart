@@ -59,6 +59,10 @@ class MyApp extends StatelessWidget {
         supportedLocales: context.supportedLocales,
         locale: context.locale,
         theme: Provider.of<ThemeProvider>(context).themeData,
+        builder: (context, child,)=>GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: ()=>FocusManager.instance.primaryFocus?.unfocus(),
+          child: child),
         home: SplashScreen()
         );
   }

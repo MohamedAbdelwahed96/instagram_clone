@@ -7,6 +7,7 @@ class UserModel {
   final List<String> followers;
   final List<String> following;
   final List<String> posts;
+  final List<String> stories;
   final String bio;
   final String pNumber;
   final String gender;
@@ -24,6 +25,7 @@ class UserModel {
     this.followers = const [],
     this.following = const [],
     this.posts = const [],
+    this.stories = const [],
     this.bio = "",
     this.pNumber = "",
     required this.gender,
@@ -43,6 +45,7 @@ class UserModel {
       followers: map['followers'] != null ? List<String>.from(map['followers']) : [],
       following: map['following'] != null ? List<String>.from(map['following']) : [],
       posts: map['posts'] != null ? List<String>.from(map['posts']) : [],
+      stories: map['stories'] != null ? List<String>.from(map['stories']) : [],
       bio: map['bio'] ?? '',
       pNumber: map['pNumber'] ?? '',
       gender: map['gender'] ?? '',
@@ -63,6 +66,7 @@ class UserModel {
       'followers': followers,
       'following': following,
       'posts': posts,
+      'stories': stories,
       'bio': bio,
       'pNumber': pNumber,
       'gender': gender,

@@ -34,7 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final theme = Theme.of(context).colorScheme;
 
       if(_user==null) {
-        return CircularProgressIndicator();
+        return Center(child: CircularProgressIndicator());
       }
 
       return Scaffold(

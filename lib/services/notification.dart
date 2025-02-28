@@ -19,8 +19,8 @@ class NotificationService {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     await _requestPermission();
     await _setupMessageHandlers();
-    final token = await _messaging.getToken();
-    print("fcm Token is: $token");
+    // final token = await _messaging.getToken();
+    // print("fcm Token is: $token");
   }
 
   Future<void> _requestPermission()async{

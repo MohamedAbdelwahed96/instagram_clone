@@ -33,13 +33,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (context, provider, _){
-      if (_user == null) {
-        return Center(child: CircularProgressIndicator());
-      }
+      if (_user == null) return Center(child: CircularProgressIndicator());
 
       return Scaffold(
-        appBar: provider.currentUser!.uid!=widget.profileID?
-        AppBar(
+        appBar: provider.currentUser!.uid != widget.profileID
+            ? AppBar(
           title: Text(_user!.username, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           centerTitle: true,
           leading: Icon(Icons.arrow_back_ios_new),
@@ -95,55 +93,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
             body: TabBarView(
                 children: [
-                  postsGrid(),
-                  postsGrid(),
-                  postsGrid()
+                  ProfilePosts(postIDs: _user!.posts),
+                  ProfilePosts(postIDs: _user!.posts),
+                  ProfilePosts(postIDs: _user!.posts)
                 ]
             ),
           ),
         ),
       );
     });
-  }
-
-  Widget postsGrid() {
-    return _user!.posts.isNotEmpty?
-    GridView.builder(
-      physics: BouncingScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 1,
-        mainAxisSpacing: 1,
-      ),
-      itemCount: _user!.posts.length,
-      itemBuilder: (context, index) {
-        final reversedIndex = _user!.posts.length - 1 - index;
-        return ProfilePosts(postID: _user!.posts[reversedIndex]);
-      },
-    )
-    :Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        CircleAvatar(
-          radius: 65,
-          child: CircleAvatar(
-            radius: 60,
-            backgroundColor: Theme.of(context).colorScheme.surface,
-            child: Icon(
-              Icons.photo_camera_outlined,
-              size: 80,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ),
-        SizedBox(height: 10),
-        Text("No Posts Yet",
-          style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),)
-      ],
-    );
   }
 
   Widget moreOptions(){
@@ -164,25 +122,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         PopupMenuItem(value: "Videos", child: Text("Videos")),
         PopupMenuItem(value: "Settings", child: Text("Settings")),
       ],
-    )
-    ;
+    );
   }
-
-// Widget profileStory(ColorScheme theme) {
-//   return Padding(
-//     padding: const EdgeInsets.symmetric(horizontal: 4.0),
-//     child: Column(
-//       children: [
-//         CircleAvatar(
-//           radius: 30,
-//           backgroundColor: theme.inversePrimary,
-//           backgroundImage: AssetImage("assets/icons/pfp.png"),
-//         ),
-//         Text('Text here', style: TextStyle(color: theme.primary)),
-//       ],
-//     ),
-//   );
-// }
 }
 
 class MyDelegate extends SliverPersistentHeaderDelegate{
@@ -191,8 +132,7 @@ class MyDelegate extends SliverPersistentHeaderDelegate{
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-        color: Theme.of(context).colorScheme.surface, child: tabBar);
+    return Container(color: Theme.of(context).colorScheme.surface, child: tabBar);
   }
 
   @override

@@ -45,8 +45,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MediaProvider>(
-        builder: (context, provider, _){
+    return Consumer<MediaProvider>(builder: (context, provider, _){
           return Scaffold(
             appBar: AppBar(
               title: Text("New Post"),
@@ -111,11 +110,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     onTap: ()async{
                       final postID = const Uuid().v1();
                       await provider.uploadMedia(context, postID);
-                      print("Filename after upload: ${provider.filename}");
-                      if (provider.filename == null) {
-                        showScaffoldMSG(context, "Upload failed: No filename generated.");
-                        return;
-                      }
+                      if (provider.filename == null) return;
                       await provider.uploadPost(context,
                         PostModel(
                             postId: postID,

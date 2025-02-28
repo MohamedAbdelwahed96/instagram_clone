@@ -3,10 +3,11 @@ import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
+import 'package:instagram_clone/presentation/screens/reels_screen.dart';
 import 'package:instagram_clone/presentation/screens/search_screen/search_screen.dart';
 import 'package:provider/provider.dart';
 import '/presentation/widgets/floating_button_widget.dart';
-import '/presentation/screens/home_screen.dart';
+import '../screens/home_screen/home_screen.dart';
 import '/presentation/screens/new_post.dart';
 import '../screens/profile_screen/profile_screen.dart';
 
@@ -63,7 +64,7 @@ class _NavigationBotBarState extends State<NavigationBotBar> {
             children: [
               HomeScreen(),
               SearchScreen(),
-              NewPostScreen(),
+              ReelsScreen(),
               ProfileScreen(profileID: "ZRtVkyk9d5YXEqhuVgCj3Esja8v2"),
               ProfileScreen(profileID: user!.uid)
             ]),

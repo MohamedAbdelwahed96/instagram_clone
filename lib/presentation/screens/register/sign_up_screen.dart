@@ -68,7 +68,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     InkWell(
                       onTap: () async{
-                        await imgProvider.uploadImage(context);
+                        await imgProvider.uploadImage(context, bucketName: "images", folder: "uploads");
                         final email = emailController.text.trimRight(),
                             pass = passController.text,
                             userName = userNameController.text,

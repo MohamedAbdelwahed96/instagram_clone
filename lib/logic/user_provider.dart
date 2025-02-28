@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/data/story_model.dart';
 import '/data/post_model.dart';
 import '/data/user_model.dart';
 import 'package:instagram_clone/presentation/widgets/scaffold_msg.dart';
@@ -177,19 +178,61 @@ class UserProvider extends ChangeNotifier {
 
   Future<PostModel?> getPostInfo(String postID) async {
     try {
-      final postData = await _store.collection("posts").doc(postID).get();
-      PostModel s = PostModel.fromMap(postData.data() as Map<String, dynamic>);
-      return s;
+      final response = await _store.collection("posts").doc(postID).get();
+      PostModel post = PostModel.fromMap(response.data() as Map<String, dynamic>);
+      return post;
     } catch (e) {
       print("Something went wrong: ${e.toString()}");
       return null;
     }
   }
 
+  Future<List<PostModel>> getUserPosts(String userID) async {
+    try {
+      final response = await _store.collection("posts").where("userID", isEqualTo: userID).get();
+      return response.docs.map((e) => PostModel.fromMap(e.data())).toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    } catch (e) {
+      print("Something went wrong: ${e.toString()}");
+      return [];
+    }
+  }
+
+
   Future getAllPosts() async{
     final response = await _store.collection("posts").get();
-    posts = response.docs.map((e)=>PostModel.fromMap(e.data())).toList();
+    posts = response.docs.map((e)=>PostModel.fromMap(e.data())).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     notifyListeners();
+  }
+
+  Future<List<StoryModel>> getRecentStories(String userId) async {
+    try {
+      final last24Hours = DateTime.now().subtract(Duration(hours: 24));
+
+      final response = await _store.collection("stories").where("userId", isEqualTo: userId)
+          // .where("createdAt", isGreaterThan: Timestamp.fromDate(last24Hours))
+          // .orderBy("createdAt", descending: true)
+          .get();
+
+      return response.docs.map((e) => StoryModel.fromMap(e.data())).toList();
+    } catch (e) {
+      print("Error fetching recent stories: ${e.toString()}");
+      return [];
+    }
+  }
+
+  Future<List<UserModel>> getFollowings() async {
+    try {
+      final response = await _store.collection("users").doc(currentUser!.uid).get();
+      final followingIds = (response.data() as Map<String, dynamic>)["following"] ?? [];
+      if (followingIds.isEmpty) return [];
+      final followingUsers = await _store.collection("users").where("uid", whereIn: followingIds).get();
+      return followingUsers.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
+    } catch (e) {
+      print("Error fetching followings: $e");
+      return [];
+    }
   }
 
   Future<List<UserModel>> searchUsers(context, String username) async {

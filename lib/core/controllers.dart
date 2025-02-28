@@ -14,7 +14,6 @@ class FormControllers {
   final message = TextEditingController();
   final page = PageController(initialPage: 0);
   final caption = TextEditingController();
-  late final VideoPlayerController video;
 
   void dispose() {
     name.dispose();
@@ -29,6 +28,5 @@ class FormControllers {
     message.dispose();
     page.dispose();
     caption.dispose();
-    video.dispose();
   }
 }

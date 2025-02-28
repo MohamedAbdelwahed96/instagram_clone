@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/post_model.dart';
+import 'package:instagram_clone/data/story_model.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -27,14 +28,14 @@ class MediaProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  Future uploadImage(context) async {
+  Future uploadImage(context, {required String bucketName, required String folder}) async {
     if (mediaFile == null) {
       showScaffoldMSG(context, "No image attached");
       return;
     }
     try {
       filename = "${DateTime.now().millisecondsSinceEpoch}.${mediaFile!.extension}";
-      await _supa.from("images").upload("uploads/$filename", File(mediaFile!.path!));
+      await _supa.from(bucketName).upload("$folder/$filename", File(mediaFile!.path!));
       showScaffoldMSG(context, "Uploaded Successfully");
       notifyListeners();
       mediaFile = null;
@@ -113,5 +114,19 @@ class MediaProvider extends ChangeNotifier{
     catch(e){
       showScaffoldMSG(context, "Something went wrong $e");
     }
+  }
+
+  Future uploadStory(context, StoryModel story) async {
+    final user = Provider.of<UserProvider>(context, listen: false).currentUser;
+    try{
+      await FirebaseFirestore.instance.collection('stories').doc(story.storyId).set(story.toMap());
+      await FirebaseFirestore.instance.collection("users").doc(user!.uid).update({"stories":FieldValue.arrayUnion([story.storyId])});
+      showScaffoldMSG(context, "Uploaded");
+    }
+    catch(e){
+      print("UploadPost Error: ${e.toString()}"); // Add logging
+      showScaffoldMSG(context, "Failed to upload");
+    }
+    notifyListeners();
   }
 }
