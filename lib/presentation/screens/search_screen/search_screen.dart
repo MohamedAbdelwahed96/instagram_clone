@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:instagram_clone/core/controllers.dart';
+import 'package:instagram_clone/data/post_model.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/search_screen/posts_results.dart';
@@ -17,12 +18,15 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final formControllers = FormControllers();
-  List<UserModel>? users;
+  List<UserModel>? _users;
+  List<PostModel>? _posts;
 
   @override
   void initState() {
     super.initState();
-    Provider.of<UserProvider>(context, listen: false).getAllPosts();
+    Provider.of<UserProvider>(context, listen: false).getAllPosts().then((fetchedPosts) {
+      setState(() => _posts = fetchedPosts);
+    });
   }
 
   @override
@@ -64,32 +68,30 @@ class _SearchScreenState extends State<SearchScreen> {
                         borderRadius: BorderRadius.circular(10)),
                   ),
                   onFieldSubmitted: (v) async =>
-                  users = await provider.searchUsers(context, formControllers.search.text),
+                  _users = await provider.searchUsers(context, formControllers.search.text),
                 ),
               ),
               if (formControllers.search.text.isEmpty)
                 Expanded(
                     child: MasonryGridView.builder(
-                      itemCount: provider.posts.length,
+                      itemCount: _posts!.length,
                       gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
                       mainAxisSpacing: 2,
                       crossAxisSpacing: 2,
                       itemBuilder: (context, index){
-                        final reversedIndex = provider.posts.length - 1 - index;
-                        final post = provider.posts[reversedIndex];
-                        return PostsResults(model: post);
+                        return PostsResults(model: _posts![index]);
                       },
                     ))
-              else if (users!.isEmpty)
+              else if (_users!.isEmpty)
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 28),
                     child: Text("No results found for ${formControllers.search.text}"),)
               else
                 Expanded(
                   child: ListView.builder(
-                      itemCount: users!.length,
+                      itemCount: _users!.length,
                       itemBuilder: (context, index){
-                        return UsersResults(user: users![index]);
+                        return UsersResults(user: _users![index]);
                       })
               )
             ],

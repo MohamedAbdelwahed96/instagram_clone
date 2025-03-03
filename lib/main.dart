@@ -6,6 +6,7 @@ import 'package:instagram_clone/logic/chat_provider.dart';
 import 'package:instagram_clone/presentation/screens/splash_screen.dart';
 import 'package:instagram_clone/services/notification.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/theme.dart';
@@ -15,6 +16,7 @@ import 'logic/user_provider.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -24,10 +26,12 @@ void main() async{
     anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3cnRjZ25teG1kZmZmcWZma2luIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc5MDAxODUsImV4cCI6MjA1MzQ3NjE4NX0.lwcWfz2YaVs7BxClu0mQM9cA-CZgnCAXqHL0-TZCKZc",
   );
 
+  bool isDarkMode = prefs.getBool("isDarkMode") ?? false;
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => ThemeProvider(isDarkMode ? darkMode : lightMode)..loadTheme()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => MediaProvider()),
         ChangeNotifierProvider(create: (context) => ChatProvider())
@@ -36,7 +40,8 @@ void main() async{
           supportedLocales: [Locale('en'), Locale('ar')],
           path: 'assets/translations',
           fallbackLocale: Locale('en'),
-          child: MyApp()),
+          child: MyApp(),
+      ),
     ),
   );
 }
@@ -45,13 +50,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Handle background messages
 }
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Provider.of<UserProvider>(context, listen: false).getUserInfo();
     return MaterialApp(
         title: 'Instagram',
         debugShowCheckedModeBanner: false,
@@ -61,7 +64,7 @@ class MyApp extends StatelessWidget {
         theme: Provider.of<ThemeProvider>(context).themeData,
         builder: (context, child,)=>GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: ()=>FocusManager.instance.primaryFocus?.unfocus(),
+          onTap: ()=> FocusManager.instance.primaryFocus?.unfocus(),
           child: child),
         home: SplashScreen()
         );

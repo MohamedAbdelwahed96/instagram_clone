@@ -10,7 +10,6 @@ class UserProvider extends ChangeNotifier {
   final _auth = FirebaseAuth.instance;
   final _store = FirebaseFirestore.instance;
   User? get currentUser => _auth.currentUser;
-  List <PostModel> posts=[];
 
   bool _isLogged=false;
   bool get isLogged => _isLogged;
@@ -90,12 +89,8 @@ class UserProvider extends ChangeNotifier {
 
   Future<bool> checkLike({required String userID, required String postID}) async{
     final response = await _store.collection("posts").doc(postID).get();
-
-    if ((response.data() as dynamic)["likes"].contains(userID)) {
-      return true;
-    } else {
-      return false;
-    }
+    if ((response.data() as dynamic)["likes"].contains(userID)) return true;
+    return false;
   }
 
   Future likePost({required String userID, required String postID}) async{
@@ -115,12 +110,8 @@ class UserProvider extends ChangeNotifier {
 
   Future<bool> checkFollow(String yourID, followerID) async{
     final response = await _store.collection("users").doc(yourID).get();
-
-    if ((response.data() as dynamic)["following"].contains(followerID)) {
-      return true;
-    } else {
-      return false;
-    }
+    if ((response.data() as dynamic)["following"].contains(followerID)) return true;
+    return false;
   }
 
   Future followProfile(String yourID, followerID) async{
@@ -141,85 +132,21 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  // Future<bool> checkSave({required String userID, required String postID}) async{
-  //   final response = await _store.collection("posts").doc(postID).get();
-  //
-  //   if ((response.data() as dynamic)["saves"].contains(userID)) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
-  //
-  // Future savePost({required String userID, required String postID}) async{
-  //   try{
-  //     final response = await _store.collection("posts").doc(postID).get();
-  //
-  //     if((response.data() as dynamic)["saves"].contains(userID)){
-  //       await _store.collection("posts").doc(postID).update({"saves":FieldValue.arrayRemove([userID])});
-  //     } else {
-  //       await _store.collection("posts").doc(postID).update({"saves":FieldValue.arrayUnion([userID])});
-  //     } notifyListeners();
-  //   }
-  //   catch(e){
-  //     print("Something went wrong: ${e.toString()}");
-  //   }
-  // }
-
   Future setLanguage({required String userID, required String language}) async{
     await _store.collection("users").doc(userID).update({"language": language});
     notifyListeners();
   }
 
-  Future setTheme({required String userID, required bool theme}) async{
-    await _store.collection("users").doc(userID).update({"darkTheme": theme});
-    notifyListeners();
-  }
-
-  Future<PostModel?> getPostInfo(String postID) async {
-    try {
-      final response = await _store.collection("posts").doc(postID).get();
-      PostModel post = PostModel.fromMap(response.data() as Map<String, dynamic>);
-      return post;
-    } catch (e) {
-      print("Something went wrong: ${e.toString()}");
-      return null;
-    }
-  }
-
   Future<List<PostModel>> getUserPosts(String userID) async {
-    try {
-      final response = await _store.collection("posts").where("userID", isEqualTo: userID).get();
+      final response = await _store.collection("posts").where("uid", isEqualTo: userID).get();
       return response.docs.map((e) => PostModel.fromMap(e.data())).toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    } catch (e) {
-      print("Something went wrong: ${e.toString()}");
-      return [];
-    }
   }
 
-
-  Future getAllPosts() async{
+  Future<List<PostModel>> getAllPosts() async{
     final response = await _store.collection("posts").get();
-    posts = response.docs.map((e)=>PostModel.fromMap(e.data())).toList()
+    return response.docs.map((e)=>PostModel.fromMap(e.data())).toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    notifyListeners();
-  }
-
-  Future<List<StoryModel>> getRecentStories(String userId) async {
-    try {
-      final last24Hours = DateTime.now().subtract(Duration(hours: 24));
-
-      final response = await _store.collection("stories").where("userId", isEqualTo: userId)
-          // .where("createdAt", isGreaterThan: Timestamp.fromDate(last24Hours))
-          // .orderBy("createdAt", descending: true)
-          .get();
-
-      return response.docs.map((e) => StoryModel.fromMap(e.data())).toList();
-    } catch (e) {
-      print("Error fetching recent stories: ${e.toString()}");
-      return [];
-    }
   }
 
   Future<List<UserModel>> getFollowings() async {
@@ -243,4 +170,40 @@ class UserProvider extends ChangeNotifier {
 
   String chatId(String userId) => currentUser!.uid.compareTo(userId) < 0 ?
     "${currentUser!.uid}\_$userId" : "$userId\_${currentUser!.uid}";
+
+  Future<List<StoryModel>> getRecentStories(String userId) async {
+    try {
+      final response = await _store.collection("stories").where("userId", isEqualTo: userId).get();
+
+      return response.docs.map((e) => StoryModel.fromMap(e.data())).where((story) =>
+          story.createdAt.isAfter(DateTime.now().subtract(Duration(hours: 24)))).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+// Future<bool> checkSave({required String userID, required String postID}) async{
+//   final response = await _store.collection("posts").doc(postID).get();
+//
+//   if ((response.data() as dynamic)["saves"].contains(userID)) {
+//     return true;
+//   } else {
+//     return false;
+//   }
+// }
+//
+// Future savePost({required String userID, required String postID}) async{
+//   try{
+//     final response = await _store.collection("posts").doc(postID).get();
+//
+//     if((response.data() as dynamic)["saves"].contains(userID)){
+//       await _store.collection("posts").doc(postID).update({"saves":FieldValue.arrayRemove([userID])});
+//     } else {
+//       await _store.collection("posts").doc(postID).update({"saves":FieldValue.arrayUnion([userID])});
+//     } notifyListeners();
+//   }
+//   catch(e){
+//     print("Something went wrong: ${e.toString()}");
+//   }
+// }
 }

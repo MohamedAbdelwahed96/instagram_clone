@@ -10,7 +10,6 @@ import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-
 class StoryScreen extends StatefulWidget {
   final UserModel user;
   const StoryScreen({super.key, required this.user});
@@ -24,7 +23,7 @@ class _StoryScreenState extends State<StoryScreen> {
   Timer? _timer;
   List<double> percWatched = [];
   List<StoryModel> stories = [];
-  List<String> imgUrls = [];
+  List<String> mediaUrls = [];
   String? pfp;
 
   @override
@@ -36,23 +35,23 @@ class _StoryScreenState extends State<StoryScreen> {
   void _fetchStories() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
-    List<StoryModel> recentStories = await userProvider.getRecentStories(widget.user.uid);
-    String? image = await mediaProvider.getImage(bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
 
-    List<String> tempImgUrls = [];
+    final getStories = await userProvider.getRecentStories(widget.user.uid);
+    final profilePic = await mediaProvider.getImage(
+        bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
 
-    for (var story in recentStories) {
-      String fullImageUrl = await mediaProvider.getImage(
-          bucketName: "stories", folderName: story.storyId, fileName: story.mediaUrl);
-      tempImgUrls.add(fullImageUrl);
-    }
+    final storyMediaUrls = await Future.wait(
+      getStories.map((story) => mediaProvider.getImage(
+          bucketName: "stories", folderName: story.storyId, fileName: story.mediaUrl),
+      ),
+    );
 
     if (mounted) {
       setState(() {
-        pfp = image;
-        imgUrls = tempImgUrls;
-        stories = recentStories;
-        percWatched = List.generate(stories.length, (index) => 0);
+        pfp = profilePic;
+        mediaUrls = storyMediaUrls;
+        stories = getStories;
+        percWatched = List.filled(stories.length, 0);
         if (stories.isNotEmpty) _watchStory();
       });
     }
@@ -115,8 +114,11 @@ class _StoryScreenState extends State<StoryScreen> {
           child: Stack(
             children: [
               stories[currentPage].isVideo
-                ? VideoPlayerWidget(videoUrl: imgUrls[currentPage])
-                : Image.network(imgUrls[currentPage], fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                ? VideoPlayerWidget(videoUrl: mediaUrls[currentPage])
+                : Image.network(mediaUrls[currentPage],
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 child: Column(

@@ -9,15 +9,14 @@ import 'package:instagram_clone/presentation/skeleton_loading/profile_header_loa
 import 'package:provider/provider.dart';
 
 class ProfileHeader extends StatefulWidget {
-  final String profileID;
-  const ProfileHeader({super.key, required this.profileID});
+  final UserModel user;
+  const ProfileHeader({super.key, required this.user});
 
   @override
   State<ProfileHeader> createState() => _ProfileHeaderState();
 }
 
 class _ProfileHeaderState extends State<ProfileHeader> {
-  UserModel? user;
   String? img;
   bool isFollowing = false;
 
@@ -27,17 +26,26 @@ class _ProfileHeaderState extends State<ProfileHeader> {
     fetchData();
   }
 
+  void fetchData() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    String? profilePicture = await Provider.of<MediaProvider>(context, listen: false)
+        .getImage(bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
+    bool follow = await userProvider.checkFollow(userProvider.currentUser!.uid, widget.user.uid);
+    setState(() {
+      img = profilePicture;
+      isFollowing = follow;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
 
-    if (img == null || user == null) {
-      return SkeletonProfileHeader();
-    }
+    if (img == null) return SkeletonProfileHeader();
 
     return Consumer<UserProvider>(builder: (context, provider, _){
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -51,25 +59,25 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    profileStat(user!.posts.length, 'Posts'),
+                    profileStat(widget.user.posts.length, 'Posts'),
                     InkWell(
                         onTap: (){},
-                        child: profileStat(user!.followers.length, 'Followers')),
+                        child: profileStat(widget.user.followers.length, 'Followers')),
                     InkWell(
                         onTap: (){},
-                        child: profileStat(user!.following.length, 'Following')),
+                        child: profileStat(widget.user.following.length, 'Following')),
                   ],
                 ),
               ),
             ],
           ),
           SizedBox(height: 10),
-          Text(user!.username, style: TextStyle(color: theme.primary, fontWeight: FontWeight.bold)),
+          Text(widget.user.username, style: TextStyle(color: theme.primary, fontWeight: FontWeight.bold)),
           Text('Category/Genre text', style: TextStyle(color: theme.secondary)),
-          Text(user!.bio, style: TextStyle(color: theme.primary)),
+          Text(widget.user.bio, style: TextStyle(color: theme.primary)),
           Text('Link goes here', style: TextStyle(color: Colors.blue)),
           SizedBox(height: 10),
-          provider.currentUser!.uid!=widget.profileID?
+          provider.currentUser!.uid!=widget.user.uid?
           Row(
             children: [
               Expanded(
@@ -93,10 +101,10 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                 child: InkWell(
                     onTap: (){
                       final thisUser = provider.currentUser!.uid;
-                      final id = provider.chatId(widget.profileID);
+                      final id = provider.chatId(widget.user.uid);
                       Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                          ChatScreen(chatId: id, currentUserId: thisUser, user: user,)));
-                    },
+                          ChatScreen(chatId: id, currentUserId: thisUser, user: widget.user)));
+                      },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
@@ -151,26 +159,17 @@ class _ProfileHeaderState extends State<ProfileHeader> {
     });
   }
 
-  void fetchData() async {
-    final usr = Provider.of<UserProvider>(context, listen: false);
-    UserModel? fetchedUser = await usr.getUserInfo(widget.profileID);
-    String? profilePicture = fetchedUser != null
-        ? await Provider.of<MediaProvider>(context, listen: false).getImage(bucketName: "images", folderName: "uploads", fileName: fetchedUser.pfpUrl)
-        : null;
-    bool follow = await usr.checkFollow(usr.currentUser!.uid, widget.profileID);
-    setState(() {
-      user = fetchedUser;
-      img = profilePicture;
-      isFollowing = follow;
-    });
-  }
-
   void toggleFollow() async {
-    final provider = Provider.of<UserProvider>(context, listen: false);
-    await provider.followProfile(provider.currentUser!.uid, widget.profileID);
-    bool updatedStatus = await provider.checkFollow(provider.currentUser!.uid, widget.profileID);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    await userProvider.followProfile(userProvider.currentUser!.uid, widget.user.uid);
+    bool follow = await userProvider.checkFollow(userProvider.currentUser!.uid, widget.user.uid);
     setState(() {
-      isFollowing = updatedStatus;
+      isFollowing = follow;
+      if (isFollowing) {
+        widget.user.followers.add(widget.user.uid);
+      } else {
+        widget.user.followers.remove(widget.user.uid);
+      }
     });
   }
 
@@ -240,7 +239,6 @@ class _ProfileHeaderState extends State<ProfileHeader> {
       ],
     );
   }
-
 }
 
 Widget profileStat(int number, String label) {

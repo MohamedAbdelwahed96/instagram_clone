@@ -13,7 +13,6 @@ class UserModel {
   final String gender;
   final String website;
   final DateTime time;
-  final bool darkTheme;
   final String language;
 
   UserModel({
@@ -31,7 +30,6 @@ class UserModel {
     required this.gender,
     this.website = "",
     required this.time,
-    this.darkTheme = false,
     this.language = "en",
   });
 
@@ -51,7 +49,6 @@ class UserModel {
       gender: map['gender'] ?? '',
       website: map['website'] ?? '',
       time: map['time'] != null ? DateTime.parse(map['time']) : DateTime.now(),
-      darkTheme: map['darkTheme'] ?? false,
       language: map['language'] ?? 'en',
     );
   }
@@ -72,7 +69,6 @@ class UserModel {
       'gender': gender,
       'website': website,
       'time': time.toIso8601String(),
-      'darkTheme': darkTheme,
       'language': language,
     };
   }

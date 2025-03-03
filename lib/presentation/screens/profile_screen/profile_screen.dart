@@ -54,11 +54,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           actions: [
             IconButton(
               icon: Icon(Icons.add_box_outlined),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>NewPostScreen())),
+              onPressed: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (context)=>NewPostScreen())),
             ),
             IconButton(
               icon: Icon(Icons.menu),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>SettingsScreen())),
+              onPressed: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (context)=>SettingsScreen(user: _user!))),
             ),
           ],
         ),
@@ -71,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: ProfileHeader(profileID: widget.profileID),
+                    child: ProfileHeader(user: _user!),
                   ),
                 ),
                 SliverPersistentHeader(
@@ -93,9 +95,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
             body: TabBarView(
                 children: [
-                  ProfilePosts(postIDs: _user!.posts),
-                  ProfilePosts(postIDs: _user!.posts),
-                  ProfilePosts(postIDs: _user!.posts)
+                  ProfilePosts(user: _user!),
+                  ProfilePosts(user: _user!),
+                  ProfilePosts(user: _user!)
                 ]
             ),
           ),

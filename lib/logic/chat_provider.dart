@@ -1,5 +1,4 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/chat_model.dart';
 
@@ -17,6 +16,34 @@ class ChatProvider extends ChangeNotifier {
         notifyListeners();
       }
     });
+  }
+
+  Future<List<ChatModel>> getUserChats(String userId) async {
+    final response = await _dbRef.child("chats").once();
+    final data = response.snapshot.value as Map<dynamic, dynamic>?;
+
+    if (data == null) return [];
+
+    Map<String, ChatModel> lastMessages = {};
+
+    data.forEach((chatId, chatData) {
+      final messages = chatData["messages"] as Map<dynamic, dynamic>;
+
+      for (var entry in messages.entries) {
+        final msgData = Map<String, dynamic>.from(entry.value);
+        final ChatModel message = ChatModel.fromMap(msgData, msgId: entry.key);
+
+        if (message.senderId == userId || message.receiverId == userId) {
+          if (!lastMessages.containsKey(chatId) || message.timeSent.isAfter(lastMessages[chatId]!.timeSent)) {
+            lastMessages[chatId] = message;
+          }
+        }
+      }
+    });
+
+    // Convert to list and sort by most recent timeSent
+    return lastMessages.values.toList()
+      ..sort((a, b) => b.timeSent.compareTo(a.timeSent));
   }
 
   Future sendMessage(ChatModel message) async {

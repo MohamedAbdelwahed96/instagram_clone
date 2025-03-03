@@ -7,35 +7,19 @@ import 'package:instagram_clone/presentation/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  final UserModel user;
+  const SettingsScreen({super.key, required this.user});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool? isDark;
-  UserModel? _user;
-
-  void initState() {
-    super.initState();
-    fetchData();
-  }
-
-  void fetchData() async {
-    final user = Provider.of<UserProvider>(context, listen: false);
-    UserModel? fetchedUser = await user.getUserInfo(user.currentUser!.uid);
-    setState(() => _user = fetchedUser);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (context, provider, _){
       final theme = Theme.of(context).colorScheme;
-
-      if(_user==null) {
-        return Center(child: CircularProgressIndicator());
-      }
+      final themeProvider = Provider.of<ThemeProvider>(context);
 
       return Scaffold(
         appBar: AppBar(
@@ -61,11 +45,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     Switch(
-                        value: _user!.darkTheme,
-                        onChanged: (value){
-                          Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
-                          provider.setTheme(userID: provider.currentUser!.uid, theme: value);
-                        }),
+                        value: themeProvider.themeData == darkMode,
+                        onChanged: (value) => themeProvider.toggleTheme()),
                   ],
                 ),
                 ListTile(
@@ -84,7 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ListTile(
                                       onTap: () {
                                         context.setLocale(Locale("en"));
-                                        provider.setLanguage(userID: _user!.uid, language: "en");
+                                        provider.setLanguage(userID: widget.user.uid, language: "en");
                                         Navigator.pop(context);
                                       },
                                       leading: Text("EN"),
@@ -93,7 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ListTile(
                                       onTap: () {
                                         context.setLocale(Locale("ar"));
-                                        provider.setLanguage(userID: _user!.uid, language: "ar");
+                                        provider.setLanguage(userID: widget.user.uid, language: "ar");
                                         Navigator.pop(context);
                                       },
                                       leading: Text("AR"),

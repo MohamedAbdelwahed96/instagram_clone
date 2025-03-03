@@ -1,0 +1,78 @@
+import 'package:flutter/material.dart';
+import 'package:instagram_clone/logic/user_provider.dart';
+import 'package:instagram_clone/presentation/screens/chat_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:instagram_clone/data/user_model.dart';
+import 'package:instagram_clone/logic/media_provider.dart';
+
+class NewMessageScreen extends StatefulWidget {
+  final String currentUserId;
+  const NewMessageScreen({super.key, required this.currentUserId});
+
+  @override
+  _NewMessageScreenState createState() => _NewMessageScreenState();
+}
+
+class _NewMessageScreenState extends State<NewMessageScreen> {
+  List<UserModel> users = [];
+  List<String?> usersPfp = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUsers();
+  }
+
+  Future<void> fetchUsers() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
+
+    List<UserModel> fetchedUsers = await userProvider.getFollowings();
+    List<String?> fetchedImages = [];
+
+    for (var user in fetchedUsers) {
+      String? profilePic = await mediaProvider.getImage(
+          bucketName: "images", folderName: "uploads", fileName: user.pfpUrl);
+      fetchedImages.add(profilePic);
+    }
+
+    setState(() {
+      users = fetchedUsers;
+      usersPfp = fetchedImages;
+      isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("New Message", style: TextStyle(fontWeight: FontWeight.bold))),
+      body: isLoading ? const Center(child: CircularProgressIndicator())
+          : users.isEmpty ? const Center(child: Text("No users available"))
+          : ListView.builder(
+        itemCount: users.length,
+        itemBuilder: (context, index) {
+          final user = users[index];
+
+          return InkWell(
+            onTap: () {
+            String chatId = Provider.of<UserProvider>(context, listen: false).chatId(user.uid);
+            Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                ChatScreen(chatId: chatId, currentUserId: widget.currentUserId, user: user),),
+            );
+          },
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(usersPfp[index]!),
+              ),
+              title: Text(user.fullName, style: TextStyle(fontWeight: FontWeight.bold),),
+              subtitle: Text(user.username,
+                  style: TextStyle(color: Theme.of(context).colorScheme.primary.withOpacity(0.5))),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

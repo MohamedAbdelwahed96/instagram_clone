@@ -10,13 +10,12 @@ import 'package:instagram_clone/presentation/widgets/video_player_widget.dart';
 import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
-
+import 'confirm_message.dart';
 import 'icons_widget.dart';
 
 class PostWidget extends StatefulWidget {
-  final PostModel model;
-  const PostWidget({super.key, required this.model});
+  final PostModel post;
+  const PostWidget({super.key, required this.post});
 
   @override
   State<PostWidget> createState() => _PostWidgetState();
@@ -38,10 +37,10 @@ class _PostWidgetState extends State<PostWidget> {
   void fetchData() async {
     final user = Provider.of<UserProvider>(context, listen: false);
     final media = Provider.of<MediaProvider>(context, listen: false);
-    UserModel? userModel = await user.getUserInfo(widget.model.uid);
+    UserModel? userModel = await user.getUserInfo(widget.post.uid);
     String profilePicture = await media.getImage(bucketName: "images", folderName: "uploads", fileName: userModel!.pfpUrl);
-    List<String> imgs = await media.getImages(bucketName: "posts", folderName: widget.model.postId);
-    bool like = await user.checkLike(userID: user.currentUser!.uid, postID: widget.model.postId);
+    List<String> imgs = await media.getImages(bucketName: "posts", folderName: widget.post.postId);
+    bool like = await user.checkLike(userID: user.currentUser!.uid, postID: widget.post.postId);
     setState(() {
       img = profilePicture;
       postMedia = imgs;
@@ -61,20 +60,37 @@ class _PostWidgetState extends State<PostWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 13,vertical: 7),
+                  padding: const EdgeInsets.only(left: 13),
                   child: Row(
                     children: [
                       InkWell(
-                          onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profileID: widget.model.uid))),
+                          onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profileID: widget.post.uid))),
                           child: CircleAvatar(backgroundImage: NetworkImage(img!))),
                       SizedBox(width: 8),
                       TextButton(
-                        child: Text(widget.model.username, style: TextStyle(fontWeight: FontWeight.w700,fontSize: 12),),
-                        onPressed: ()=> Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profileID: widget.model.uid))),),
+                        child: Text(widget.post.username, style: TextStyle(fontWeight: FontWeight.w700,fontSize: 12),),
+                        onPressed: ()=> Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profileID: widget.post.uid))),),
                       Spacer(),
                       IconButton(
-                          onPressed: () async => await mediaProvider.deletePost(context, widget.model),
-                          icon: Icon(Icons.more_horiz)),
+                        onPressed: () {},
+                        icon: PopupMenuButton<String>(
+                          onSelected: (value) async {
+                            if (value == "Delete") {
+                              bool? confirmDelete = await showConfirmationDialog(
+                                  context, "Delete Post",
+                                  "Are you sure you want to delete this post?");
+                              if (confirmDelete == true) {
+                                await mediaProvider.deletePost(context, widget.post);
+                              }
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            if (widget.post.uid == userProvider.currentUser!.uid)
+                              PopupMenuItem(value: "Delete", child: Text("Delete"),),
+                          ],
+                          icon: Icon(Icons.more_horiz),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -84,7 +100,7 @@ class _PostWidgetState extends State<PostWidget> {
                     children: [
                       PageView.builder(
                           scrollDirection: Axis.horizontal,
-                          itemCount: widget.model.mediaUrls.length,
+                          itemCount: widget.post.mediaUrls.length,
                           onPageChanged: (page) => setState(() => _currentPage = page),
                           itemBuilder: (context, index) {
 
@@ -95,7 +111,7 @@ class _PostWidgetState extends State<PostWidget> {
                             return isVideo? VideoPlayerWidget(videoUrl: postMedia![index])
                                 : Image.network(postMedia![index], fit: BoxFit.cover);
                           }),
-                      widget.model.mediaUrls.length>1?
+                      widget.post.mediaUrls.length>1?
                       Positioned(top: 16, right: 16,
                         child: Container(
                           width: 30,
@@ -104,7 +120,7 @@ class _PostWidgetState extends State<PostWidget> {
                               color: Colors.black45,
                               borderRadius: BorderRadius.circular(12)),
                           alignment: Alignment.center,
-                          child: Text('${_currentPage + 1}/${widget.model.mediaUrls.length}',
+                          child: Text('${_currentPage + 1}/${widget.post.mediaUrls.length}',
                             style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
                         ),
@@ -113,10 +129,10 @@ class _PostWidgetState extends State<PostWidget> {
                     ],
                   ),
                 ),
-                widget.model.mediaUrls.length > 1?
+                widget.post.mediaUrls.length > 1?
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(widget.model.mediaUrls.length,
+                  children: List.generate(widget.post.mediaUrls.length,
                         (index) => Container(
                       margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
                       width: _currentPage == index ? 10 : 8,
@@ -134,11 +150,21 @@ class _PostWidgetState extends State<PostWidget> {
                   padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 11),
                   child: Row(
                     children: [
-                      IconButton(onPressed: () {
-                        userProvider.likePost(userID: userProvider.currentUser!.uid, postID: widget.model.postId);
-                        setState(() => isFav=!isFav);
-                      }, icon: isFav==false?Icon(Icons.favorite_border, size: 30)
-                          :Icon(Icons.favorite, color: Colors.red, size: 30)),
+                      IconsWidget(
+                        icon: isFav ? "fav_filled" : "fav",
+                        color: isFav ? Colors.red : Theme.of(context).colorScheme.primary,
+                        onTap: (){
+                          final userID = userProvider.currentUser!.uid;
+                          setState(() {
+                            isFav=!isFav;
+                            if (isFav) {
+                              widget.post.likes.add(userID);
+                            } else {
+                              widget.post.likes.remove(userID);
+                            }
+                          });
+                          userProvider.likePost(userID: userID, postID: widget.post.postId);
+                        }),
                       SizedBox(width: 12),
                       IconsWidget(icon: "comment"),
                       SizedBox(width: 12),
@@ -153,25 +179,25 @@ class _PostWidgetState extends State<PostWidget> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("${widget.model.likes.length} Likes"),
+                      Text("${widget.post.likes.length} Likes"),
                       RichText(
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: widget.model.username,
+                              text: widget.post.username,
                               style: TextStyle(fontWeight: FontWeight.bold, color: theme.primary),
                               recognizer: TapGestureRecognizer()..onTap = () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profileID: widget.model.uid)));
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profileID: widget.post.uid)));
                               },
                             ),
                             TextSpan(
-                              text: " ${widget.model.caption}",
+                              text: " ${widget.post.caption}",
                               style: TextStyle(color: theme.primary),
                             ),
                           ],
                         ),
                       ),
-                      Text(timeago.format(widget.model.createdAt), style: TextStyle(color: theme.primary.withOpacity(0.5)),)
+                      Text(timeago.format(widget.post.createdAt), style: TextStyle(color: theme.primary.withOpacity(0.5)),)
                     ],
                   ),
                 ),

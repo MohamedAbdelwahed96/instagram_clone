@@ -97,7 +97,7 @@ class MediaProvider extends ChangeNotifier{
       showScaffoldMSG(context, "Uploaded");
     }
     catch(e){
-      print("UploadPost Error: ${e.toString()}"); // Add logging
+      print("UploadPost Error: ${e.toString()}");
       showScaffoldMSG(context, "Failed to upload");
     }
     notifyListeners();
@@ -105,9 +105,9 @@ class MediaProvider extends ChangeNotifier{
 
   Future deletePost(context, PostModel post) async {
     try{
-      final user = Provider.of<UserProvider>(context, listen: false).currentUser;
+      final user = Provider.of<UserProvider>(context, listen: false).currentUser!.uid;
       await FirebaseFirestore.instance.collection('posts').doc(post.postId).delete();
-      await FirebaseFirestore.instance.collection("users").doc(user!.uid).update({"posts":FieldValue.arrayRemove([post.postId])});
+      await FirebaseFirestore.instance.collection("users").doc(user).update({"posts":FieldValue.arrayRemove([post.postId])});
       await _supa.from("posts").remove(post.mediaUrls.map((file) => "${post.postId}/$file").toList());
       showScaffoldMSG(context, "Deleted Successfully");
     }

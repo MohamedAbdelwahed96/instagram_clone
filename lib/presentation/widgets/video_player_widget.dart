@@ -1,13 +1,12 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/core/controllers.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
   final File? videoFile;
   final String? videoUrl;
-  const VideoPlayerWidget({super.key, this.videoFile, this.videoUrl});
+  final BoxFit fit;
+  const VideoPlayerWidget({super.key, this.videoFile, this.videoUrl, this.fit = BoxFit.cover});
 
   @override
   _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
@@ -43,7 +42,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           width: double.infinity, // Makes it fill the width
           height: double.infinity,
           child: FittedBox(
-            fit: BoxFit.fitWidth,
+            fit: widget.fit,
             child: SizedBox(
                 width: video.value.size.width,
                 height: video.value.size.height,

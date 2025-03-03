@@ -4,7 +4,10 @@ import 'package:instagram_clone/data/chat_model.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/chat_provider.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
+import 'package:instagram_clone/presentation/screens/profile_screen/profile_screen.dart';
 import 'package:provider/provider.dart';
+
+import '../widgets/confirm_message.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -19,6 +22,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final formControllers = FormControllers();
   String? userImg;
+
 
   @override
   void initState() {
@@ -79,12 +83,24 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final isMe = messages[index].senderId==widget.currentUserId;
+                    final bool isPreviousSameUser = index < messages.length - 1 &&
+                        messages[index].senderId == messages[index + 1].senderId;
+                    final bool isLastFromUser = index == 0 ||
+                        messages[index].senderId != messages[index - 1].senderId;
+
+
 
                     return Row(
                       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
                       children: [
-                        if (!isMe) CircleAvatar(foregroundImage: NetworkImage(userImg!)),
-                        InkWell(
+                        if (!isMe && isLastFromUser) InkWell(
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                              ProfileScreen(profileID: widget.user!.uid),
+                          ),
+                          ),
+                            child: CircleAvatar(foregroundImage: NetworkImage(userImg!))),
+                        if (!isMe && !isLastFromUser) SizedBox(width: MediaQuery.of(context).size.width*0.1),
+                          InkWell(
                           onLongPress: () {
                             if (isMe) {
                               showDialog(context: context, builder: (context){
@@ -100,7 +116,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                         children: [
                                           ListTile(
                                             onTap: () async{
-                                              await provider.deleteMessage(widget.chatId, messages[index].messageId!);
+                                              bool? confirmDelete = await showConfirmationDialog(context,
+                                                  "Delete message", "Are you sure you want to delete this message?");
+                                              if (confirmDelete == true) await provider.deleteMessage(widget.chatId, messages[index].messageId!);
                                               Navigator.pop(context);
                                             },
                                             leading: Icon(Icons.delete, size: 24, color: theme.primary),
@@ -121,7 +139,12 @@ class _ChatScreenState extends State<ChatScreen> {
                             padding: EdgeInsets.all(10.0),
                             decoration: BoxDecoration(
                               color: isMe ? Colors.blue : Colors.grey[300],
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(isMe ? 12 : isPreviousSameUser ? 0 : 12),
+                                topRight: Radius.circular(isMe ? (isPreviousSameUser ? 0 : 12) : 12),
+                                bottomLeft: Radius.circular(12),
+                                bottomRight: Radius.circular(12),
+                              ),
                             ),
                             child: Text(messages[index].message,
                               style: TextStyle(color: isMe ? Colors.white : Colors.black),
