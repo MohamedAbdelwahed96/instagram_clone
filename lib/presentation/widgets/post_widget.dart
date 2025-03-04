@@ -154,7 +154,7 @@ class _PostWidgetState extends State<PostWidget> {
                   child: Row(
                     children: [
                       IconsWidget(
-                        icon: isLiked ? "fav_filled" : "fav",
+                        icon: isLiked ? "like_filled" : "like",
                         color: isLiked ? Colors.red : Theme.of(context).colorScheme.primary,
                         onTap: (){
                           final userID = userProvider.currentUser!.uid;

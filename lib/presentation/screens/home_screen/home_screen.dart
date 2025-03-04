@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(width: 8),
                       Icon(Icons.arrow_drop_down),
                       Spacer(),
-                      IconsWidget(icon: "fav"),
+                      IconsWidget(icon: "like"),
                       SizedBox(width: 24),
                       IconsWidget(icon: "chat",
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => MessagesScreen(user: users![0],))),),

@@ -6,7 +6,15 @@ class VideoPlayerWidget extends StatefulWidget {
   final File? videoFile;
   final String? videoUrl;
   final BoxFit fit;
-  const VideoPlayerWidget({super.key, this.videoFile, this.videoUrl, this.fit = BoxFit.cover});
+  final bool tapToPlayPause;
+
+  const VideoPlayerWidget({
+    super.key,
+    this.videoFile,
+    this.videoUrl,
+    this.fit = BoxFit.cover,
+    this.tapToPlayPause = false,
+  });
 
   @override
   _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
@@ -34,38 +42,24 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return video.value.isInitialized
-        ? Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          width: double.infinity, // Makes it fill the width
-          height: double.infinity,
-          child: FittedBox(
-            fit: widget.fit,
-            child: SizedBox(
-                width: video.value.size.width,
-                height: video.value.size.height,
-                child: VideoPlayer(video)),
+    if(!video.value.isInitialized) return Center(child: CircularProgressIndicator());
+    return InkWell(
+      onTap: (){
+        if (widget.tapToPlayPause) {
+          setState(() => video.value.isPlaying ? video.pause() : video.play());
+        }},
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: FittedBox(
+          fit: widget.fit,
+          child: SizedBox(
+            width: video.value.size.width,
+            height: video.value.size.height,
+            child: VideoPlayer(video),
           ),
         ),
-        Positioned(
-          bottom: 10,
-          right: 10,
-          child: IconButton(
-            icon: Icon(
-              video.value.isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              setState(() {
-                video.value.isPlaying ? video.pause() : video.play();
-              });
-            },
-          ),
-        ),
-      ],
-    )
-        : Center(child: CircularProgressIndicator());
+      ),
+    );
   }
 }

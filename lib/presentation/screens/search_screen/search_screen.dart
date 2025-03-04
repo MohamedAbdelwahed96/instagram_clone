@@ -39,6 +39,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
+    if (_posts == null) return const Center(child: CircularProgressIndicator());
 
     return Consumer<UserProvider>(builder: (context, provider, _){
       return SafeArea(
