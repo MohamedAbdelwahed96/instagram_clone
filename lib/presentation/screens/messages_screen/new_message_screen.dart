@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/chat_screen.dart';
@@ -47,9 +48,9 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("New Message", style: TextStyle(fontWeight: FontWeight.bold))),
-      body: isLoading ? const Center(child: CircularProgressIndicator())
-          : users.isEmpty ? const Center(child: Text("No users available"))
+      appBar: AppBar(title: Text("new_message".tr(), style: TextStyle(fontWeight: FontWeight.bold))),
+      body: isLoading ? Center(child: CircularProgressIndicator())
+          : users.isEmpty ? Center(child: Text("no_users_available".tr()))
           : ListView.builder(
         itemCount: users.length,
         itemBuilder: (context, index) {

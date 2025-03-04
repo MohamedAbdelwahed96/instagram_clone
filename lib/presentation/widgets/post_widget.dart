@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/presentation/skeleton_loading/post_widget_loading.dart';
@@ -25,7 +26,7 @@ class _PostWidgetState extends State<PostWidget> {
   String? img;
   List<String>? postMedia;
   bool isSaved = false;
-  bool isFav = false;
+  bool isLiked = false;
   int _currentPage = 0;
 
   @override
@@ -41,10 +42,12 @@ class _PostWidgetState extends State<PostWidget> {
     String profilePicture = await media.getImage(bucketName: "images", folderName: "uploads", fileName: userModel!.pfpUrl);
     List<String> imgs = await media.getImages(bucketName: "posts", folderName: widget.post.postId);
     bool like = await user.checkLike(userID: user.currentUser!.uid, postID: widget.post.postId);
+    bool save = await user.checkSave(userID: user.currentUser!.uid, postID: widget.post.postId);
     setState(() {
       img = profilePicture;
       postMedia = imgs;
-      isFav = like;
+      isLiked = like;
+      isSaved = save;
     });
   }
 
@@ -77,8 +80,8 @@ class _PostWidgetState extends State<PostWidget> {
                           onSelected: (value) async {
                             if (value == "Delete") {
                               bool? confirmDelete = await showConfirmationDialog(
-                                  context, "Delete Post",
-                                  "Are you sure you want to delete this post?");
+                                  context, "delete_post".tr(),
+                                  "confirm_delete_post".tr());
                               if (confirmDelete == true) {
                                 await mediaProvider.deletePost(context, widget.post);
                               }
@@ -86,7 +89,7 @@ class _PostWidgetState extends State<PostWidget> {
                           },
                           itemBuilder: (context) => [
                             if (widget.post.uid == userProvider.currentUser!.uid)
-                              PopupMenuItem(value: "Delete", child: Text("Delete"),),
+                              PopupMenuItem(value: "Delete", child: Text("delete".tr()),),
                           ],
                           icon: Icon(Icons.more_horiz),
                         ),
@@ -151,13 +154,13 @@ class _PostWidgetState extends State<PostWidget> {
                   child: Row(
                     children: [
                       IconsWidget(
-                        icon: isFav ? "fav_filled" : "fav",
-                        color: isFav ? Colors.red : Theme.of(context).colorScheme.primary,
+                        icon: isLiked ? "fav_filled" : "fav",
+                        color: isLiked ? Colors.red : Theme.of(context).colorScheme.primary,
                         onTap: (){
                           final userID = userProvider.currentUser!.uid;
                           setState(() {
-                            isFav=!isFav;
-                            if (isFav) {
+                            isLiked=!isLiked;
+                            if (isLiked) {
                               widget.post.likes.add(userID);
                             } else {
                               widget.post.likes.remove(userID);
@@ -170,7 +173,11 @@ class _PostWidgetState extends State<PostWidget> {
                       SizedBox(width: 12),
                       IconsWidget(icon: "share"),
                       Spacer(),
-                      IconsWidget(onTap: ()=> setState(() => isSaved=!isSaved), icon: isSaved==false?"save":"save_filled"),
+                      IconsWidget(onTap: () {
+                        final userID = userProvider.currentUser!.uid;
+                        userProvider.savePost(context, userID: userID, postID: widget.post.postId);
+                        setState(() => isSaved=!isSaved);
+                      }, icon: isSaved==false?"save":"save_filled"),
                     ],
                   ),
                 ),
@@ -179,7 +186,7 @@ class _PostWidgetState extends State<PostWidget> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("${widget.post.likes.length} Likes"),
+                      Text("${widget.post.likes.length} ${"likes".tr()}"),
                       RichText(
                         text: TextSpan(
                           children: [

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/core/controllers.dart';
@@ -50,7 +51,7 @@ class _NewStoryState extends State<NewStory> {
     return Consumer<MediaProvider>(builder: (context, provider, _){
       return Scaffold(
         appBar: AppBar(
-          title: Text("Add to story"),
+          title: Text("add_to_story".tr()),
           centerTitle: true,
           leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: ()=> Navigator.pop(context)),
           actions: [
@@ -101,7 +102,7 @@ class _NewStoryState extends State<NewStory> {
                   );
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBotBar()));
                 }, // upload post
-                child: ButtonWidget(text: "Post"),
+                child: ButtonWidget(text: "post".tr()),
               ),
             ),
           ],

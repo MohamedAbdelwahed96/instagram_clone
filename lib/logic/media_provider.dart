@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/post_model.dart';
@@ -30,23 +31,23 @@ class MediaProvider extends ChangeNotifier{
 
   Future uploadImage(context, {required String bucketName, required String folder}) async {
     if (mediaFile == null) {
-      showScaffoldMSG(context, "No image attached");
+      showScaffoldMSG(context, "no_image_attached");
       return;
     }
     try {
       filename = "${DateTime.now().millisecondsSinceEpoch}.${mediaFile!.extension}";
       await _supa.from(bucketName).upload("$folder/$filename", File(mediaFile!.path!));
-      showScaffoldMSG(context, "Uploaded Successfully");
+      showScaffoldMSG(context, "uploaded_successfully");
       notifyListeners();
       mediaFile = null;
     } catch (e) {
-      showScaffoldMSG(context, "Upload failed: ${e.toString()}");
+      showScaffoldMSG(context, "${"upload_failed".tr()}: ${e.toString()}");
     }
   }
 
   Future uploadMedia(BuildContext context, String id) async {
     if (mediaFiles.isEmpty) {
-      showScaffoldMSG(context, "No media attached");
+      showScaffoldMSG(context, "no_media_attached");
       return;
     }
     media=[];
@@ -57,11 +58,11 @@ class MediaProvider extends ChangeNotifier{
         media.add(filename!);
         await _supa.from("posts").upload("$id/$filename", File(file.path!));
       }
-      showScaffoldMSG(context, "Uploaded Successfully");
+      showScaffoldMSG(context, "uploaded_successfully");
       notifyListeners();
       mediaFiles.clear();
     } catch (e) {
-      showScaffoldMSG(context, "Upload failed: ${e.toString()}");
+      showScaffoldMSG(context, "${"upload_failed".tr()}: ${e.toString()}");
     }
   }
 
@@ -71,7 +72,6 @@ class MediaProvider extends ChangeNotifier{
       String img = await _supa.from(bucketName).getPublicUrl("$folderName/$fileName");
       return img;
     } catch (e) {
-      print("No image found in Subabase: ${e.toString()}");
       return "";
     }
   }
@@ -84,7 +84,6 @@ class MediaProvider extends ChangeNotifier{
         return media;
     }
     catch(e){
-      print("Something went wrong: ${e.toString()}");
       return [];
     }
   }
@@ -94,11 +93,10 @@ class MediaProvider extends ChangeNotifier{
     try{
       await FirebaseFirestore.instance.collection('posts').doc(post.postId).set(post.toMap());
       await FirebaseFirestore.instance.collection("users").doc(user!.uid).update({"posts":FieldValue.arrayUnion([post.postId])});
-      showScaffoldMSG(context, "Uploaded");
+      showScaffoldMSG(context, "uploaded_successfully");
     }
     catch(e){
-      print("UploadPost Error: ${e.toString()}");
-      showScaffoldMSG(context, "Failed to upload");
+      showScaffoldMSG(context, "upload_failed");
     }
     notifyListeners();
   }
@@ -109,11 +107,12 @@ class MediaProvider extends ChangeNotifier{
       await FirebaseFirestore.instance.collection('posts').doc(post.postId).delete();
       await FirebaseFirestore.instance.collection("users").doc(user).update({"posts":FieldValue.arrayRemove([post.postId])});
       await _supa.from("posts").remove(post.mediaUrls.map((file) => "${post.postId}/$file").toList());
-      showScaffoldMSG(context, "Deleted Successfully");
+      showScaffoldMSG(context, "deleted_successfully");
     }
     catch(e){
-      showScaffoldMSG(context, "Something went wrong $e");
+      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
     }
+    notifyListeners();
   }
 
   Future uploadStory(context, StoryModel story) async {
@@ -121,11 +120,10 @@ class MediaProvider extends ChangeNotifier{
     try{
       await FirebaseFirestore.instance.collection('stories').doc(story.storyId).set(story.toMap());
       await FirebaseFirestore.instance.collection("users").doc(user!.uid).update({"stories":FieldValue.arrayUnion([story.storyId])});
-      showScaffoldMSG(context, "Uploaded");
+      showScaffoldMSG(context, "uploaded_successfully");
     }
     catch(e){
-      print("UploadPost Error: ${e.toString()}"); // Add logging
-      showScaffoldMSG(context, "Failed to upload");
+      showScaffoldMSG(context, "upload_failed");
     }
     notifyListeners();
   }

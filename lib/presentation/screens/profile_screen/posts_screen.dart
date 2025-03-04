@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/post_model.dart';
 import 'package:instagram_clone/data/user_model.dart';
@@ -43,7 +44,7 @@ class _PostsScreenState extends State<PostsScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-            title: const Text("Posts",
+            title: Text("posts".tr(),
                 style: TextStyle(fontWeight: FontWeight.bold)),
           scrolledUnderElevation: 0,
         ),

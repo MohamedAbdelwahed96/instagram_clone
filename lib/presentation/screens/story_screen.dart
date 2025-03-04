@@ -3,6 +3,7 @@ import 'package:instagram_clone/data/story_model.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
+import 'package:instagram_clone/presentation/screens/profile_screen/profile_screen.dart';
 import 'package:instagram_clone/presentation/widgets/video_player_widget.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'dart:async';
@@ -36,12 +37,12 @@ class _StoryScreenState extends State<StoryScreen> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
 
-    final getStories = await userProvider.getRecentStories(widget.user.uid);
+    final fetchedStories = await userProvider.getRecentStories(widget.user.uid);
     final profilePic = await mediaProvider.getImage(
         bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
 
     final storyMediaUrls = await Future.wait(
-      getStories.map((story) => mediaProvider.getImage(
+      fetchedStories.map((story) => mediaProvider.getImage(
           bucketName: "stories", folderName: story.storyId, fileName: story.mediaUrl),
       ),
     );
@@ -50,7 +51,7 @@ class _StoryScreenState extends State<StoryScreen> {
       setState(() {
         pfp = profilePic;
         mediaUrls = storyMediaUrls;
-        stories = getStories;
+        stories = fetchedStories;
         percWatched = List.filled(stories.length, 0);
         if (stories.isNotEmpty) _watchStory();
       });
@@ -58,6 +59,7 @@ class _StoryScreenState extends State<StoryScreen> {
   }
 
   void _watchStory() {
+    _timer?.cancel();
     _timer = Timer.periodic(Duration(milliseconds: 50), (timer) {
       if (mounted) {
         setState(() {
@@ -72,7 +74,10 @@ class _StoryScreenState extends State<StoryScreen> {
               _watchStory();
             }
             else {
-              Navigator.pop(context);
+              if (mounted && Navigator.canPop(context)) {
+                _timer?.cancel();
+                Navigator.pop(context);
+              }
             }
           }
         });
@@ -90,6 +95,10 @@ class _StoryScreenState extends State<StoryScreen> {
   Widget build(BuildContext context) {
     if(stories.isEmpty) return Center(child: CircularProgressIndicator());
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_timer == null || !_timer!.isActive) _watchStory();
+    });
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.black,
@@ -101,6 +110,8 @@ class _StoryScreenState extends State<StoryScreen> {
                   percWatched[currentPage-1]=0;
                   percWatched[currentPage]=0;
                   currentPage--;
+                } else {
+                  percWatched[currentPage] = 0;
                 }
               });
             } else {
@@ -108,7 +119,13 @@ class _StoryScreenState extends State<StoryScreen> {
                 if(currentPage<stories.length-1){
                   percWatched[currentPage]=1;
                   currentPage++;
-                }});
+                } else {
+                  if (mounted && Navigator.canPop(context)) {
+                    _timer?.cancel();
+                    Navigator.pop(context);
+                  }
+                }
+              });
             }
           },
           child: Stack(
@@ -141,8 +158,14 @@ class _StoryScreenState extends State<StoryScreen> {
                       child: Row(
                         spacing: 10,
                         children: [
-                          CircleAvatar(backgroundImage: NetworkImage(pfp!)),
-                          Text(widget.user.username, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+                          InkWell(
+                            onTap: ()=> Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>
+                                  ProfileScreen(profileID: widget.user.uid))),
+                              child: CircleAvatar(backgroundImage: NetworkImage(pfp!))),
+                          InkWell(
+                              onTap: ()=> Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>
+                                  ProfileScreen(profileID: widget.user.uid))),
+                              child: Text(widget.user.username, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)),
                           Text(timeago.format(stories[currentPage].createdAt, locale: 'en_short'),
                             style: TextStyle(color: Colors.grey),)
                         ],

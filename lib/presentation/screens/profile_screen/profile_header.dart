@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
@@ -59,13 +60,13 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    profileStat(widget.user.posts.length, 'Posts'),
+                    profileStat(widget.user.posts.length, "posts"),
                     InkWell(
                         onTap: (){},
-                        child: profileStat(widget.user.followers.length, 'Followers')),
+                        child: profileStat(widget.user.followers.length, "followers")),
                     InkWell(
                         onTap: (){},
-                        child: profileStat(widget.user.following.length, 'Following')),
+                        child: profileStat(widget.user.following.length, "following")),
                   ],
                 ),
               ),
@@ -91,7 +92,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
-                      child: Text(isFollowing ? 'Unfollow' : 'Follow', style: TextStyle(color: isFollowing ? theme.primary: Colors.white)),
+                      child: Text(isFollowing ? "unfollow".tr() : "follow".tr(), style: TextStyle(color: isFollowing ? theme.primary: Colors.white)),
                     )
                 ),
               ),
@@ -111,7 +112,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                         color: Color.fromRGBO(239, 239, 239, 0.2),
                         borderRadius: BorderRadius.circular(8)),
                       alignment: Alignment.center,
-                      child: Text('Message' , style: TextStyle(color: theme.primary)),
+                      child: Text("message".tr() , style: TextStyle(color: theme.primary)),
                     )
                 ),
               ): SizedBox(),
@@ -131,7 +132,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     alignment: Alignment.center,
-                    child: Text('Edit Profile', style: TextStyle(color: theme.primary)),
+                    child: Text("edit_profile".tr(), style: TextStyle(color: theme.primary)),
                   ),
                 ),
               ),
@@ -161,7 +162,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
 
   void toggleFollow() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    await userProvider.followProfile(userProvider.currentUser!.uid, widget.user.uid);
+    await userProvider.followProfile(userProvider.currentUser!.uid, widget.user.uid, context);
     bool follow = await userProvider.checkFollow(userProvider.currentUser!.uid, widget.user.uid);
     setState(() {
       isFollowing = follow;
@@ -187,7 +188,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.center,
-              child: Text(isFollowing ? 'Unfollow' : 'Follow',
+              child: Text(isFollowing ? "unfollow".tr() : "follow".tr(),
                   style: TextStyle(color: isFollowing ? Colors.black : Colors.white)),
             ),
           ),
@@ -205,7 +206,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.center,
-              child: Text('Message', style: TextStyle(color: Colors.black)),
+              child: Text("message".tr(), style: TextStyle(color: Colors.black)),
             ),
           ),
         )
@@ -245,7 +246,7 @@ Widget profileStat(int number, String label) {
   return Column(
     children: [
       Text(number.toString(), style: TextStyle(fontWeight: FontWeight.w700)),
-      Text(label),
+      Text(label.tr()),
     ],
   );
 }

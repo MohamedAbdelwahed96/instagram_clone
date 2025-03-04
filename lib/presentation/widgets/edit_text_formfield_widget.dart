@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -40,7 +41,7 @@ class _EditTextFormfieldWidgetState extends State<EditTextFormfieldWidget> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
-              width: MediaQuery.of(context).size.width*.25, child: Text(widget.name)),
+              width: MediaQuery.of(context).size.width*.25, child: Text(widget.name.tr())),
           Expanded(
               child: Column(
                 children: [
@@ -54,9 +55,9 @@ class _EditTextFormfieldWidgetState extends State<EditTextFormfieldWidget> {
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton(
                             style: TextStyle(color: Theme.of(context).colorScheme.primary),
-                            items: const [
-                              DropdownMenuItem(value: "Male", child: Text("Male")),
-                              DropdownMenuItem(value: "Female", child: Text("Female"))
+                            items: [
+                              DropdownMenuItem(value: "Male", child: Text("male".tr())),
+                              DropdownMenuItem(value: "Female", child: Text("female".tr()))
                             ],
                             value: dropValue,
                             onChanged: (String? value) => setState(() {

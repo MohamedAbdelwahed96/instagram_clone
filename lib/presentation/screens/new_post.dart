@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/core/controllers.dart';
@@ -48,7 +49,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
     return Consumer<MediaProvider>(builder: (context, provider, _){
           return Scaffold(
             appBar: AppBar(
-              title: Text("New Post"),
+              title: Text("new_post".tr()),
               centerTitle: true,
               leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: ()=> Navigator.pop(context)),
               actions: [
@@ -98,7 +99,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   child: TextField(
                     controller: formControllers.caption,
                     decoration: InputDecoration(
-                      hintText: "Write a caption...",
+                      hintText: "write_caption".tr(),
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 3,
@@ -125,7 +126,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                       );
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBotBar()));
                     }, // upload post
-                    child: ButtonWidget(text: "Post"),
+                    child: ButtonWidget(text: "post".tr()),
                   ),
                 ),
               ],

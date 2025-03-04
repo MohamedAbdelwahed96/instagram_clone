@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/story_model.dart';
@@ -19,11 +20,11 @@ class UserProvider extends ChangeNotifier {
       UserCredential userCd = await _auth.createUserWithEmailAndPassword(email: user.email, password: password);
       await _store.collection("users").doc(userCd.user!.uid).set(user.toMap());
       await _store.collection("users").doc(userCd.user!.uid).update({"uid":userCd.user!.uid});
-      showScaffoldMSG(context, "Created Successfully");
+      showScaffoldMSG(context, "created_successfully");
       _isLogged=true;
     }
     catch(e){
-      showScaffoldMSG(context, "Something went wrong: ${e.toString()}");
+      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
       _isLogged=false;
     }
     notifyListeners();
@@ -32,11 +33,11 @@ class UserProvider extends ChangeNotifier {
   Future<void> signIn(context, String email, password) async {
     try{
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      showScaffoldMSG(context, "Logged in Successfully");
+      showScaffoldMSG(context, "logged_in_successfully");
       _isLogged = true;
     }
     catch(e){
-      showScaffoldMSG(context, "Something went wrong: ${e.toString()}");
+      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
       _isLogged=false;
     }
     notifyListeners();
@@ -44,7 +45,7 @@ class UserProvider extends ChangeNotifier {
 
   Future<void> signOut(context) async{
     await _auth.signOut();
-    showScaffoldMSG(context, "Signed out Successfully!");
+    showScaffoldMSG(context, "signed_out_successfully");
   }
 
   UserModel? _userData;
@@ -53,10 +54,8 @@ class UserProvider extends ChangeNotifier {
   Future<UserModel?> getUserInfo(String userID) async {
     try {
       final userData = await _store.collection("users").doc(userID).get();
-
       return UserModel.fromMap(userData.data() as Map<String, dynamic>);
     } catch (e) {
-      print("Something went wrong: ${e.toString()}");
       return null;
     }
   }
@@ -65,7 +64,7 @@ class UserProvider extends ChangeNotifier {
     try {
       if(email!=currentUser!.email) {
         await currentUser!.verifyBeforeUpdateEmail(email);
-        showScaffoldMSG(context, "Check your email to confirm.");
+        showScaffoldMSG(context, "check_email_to_confirm");
       }
 
       User? updatedUser = _auth.currentUser;
@@ -80,10 +79,10 @@ class UserProvider extends ChangeNotifier {
           "gender": gender,
           "pfpUrl": pfpUrl
         });
-        showScaffoldMSG(context, "Updated Successfully");
+        showScaffoldMSG(context, "updated_successfully");
       }
     } catch (e) {
-      showScaffoldMSG(context, "Error: ${e.toString()}");
+      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
     }
   }
 
@@ -93,18 +92,20 @@ class UserProvider extends ChangeNotifier {
     return false;
   }
 
-  Future likePost({required String userID, required String postID}) async{
+  Future likePost({required String userID, required String postID, context}) async{
     try{
       final response = await _store.collection("posts").doc(postID).get();
 
       if((response.data() as dynamic)["likes"].contains(userID)){
         await _store.collection("posts").doc(postID).update({"likes":FieldValue.arrayRemove([userID])});
+        await _store.collection("users").doc(userID).update({"likes":FieldValue.arrayRemove([postID])});
       } else {
         await _store.collection("posts").doc(postID).update({"likes":FieldValue.arrayUnion([userID])});
+        await _store.collection("users").doc(userID).update({"likes":FieldValue.arrayUnion([postID])});
       } notifyListeners();
     }
     catch(e){
-      print("Something went wrong: ${e.toString()}");
+      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
     }
   }
 
@@ -114,7 +115,7 @@ class UserProvider extends ChangeNotifier {
     return false;
   }
 
-  Future followProfile(String yourID, followerID) async{
+  Future followProfile(String yourID, followerID, context) async{
     try{
       final response = await _store.collection("users").doc(yourID).get();
 
@@ -128,19 +129,40 @@ class UserProvider extends ChangeNotifier {
       notifyListeners();
     }
     catch(e){
-      print("Something went wrong: ${e.toString()}");
+      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
     }
-  }
-
-  Future setLanguage({required String userID, required String language}) async{
-    await _store.collection("users").doc(userID).update({"language": language});
-    notifyListeners();
   }
 
   Future<List<PostModel>> getUserPosts(String userID) async {
       final response = await _store.collection("posts").where("uid", isEqualTo: userID).get();
       return response.docs.map((e) => PostModel.fromMap(e.data())).toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  Future<List<PostModel>> getLikedPosts(String userID) async {
+    final response = await _store.collection("posts").where("likes", arrayContains: userID).get();
+    return response.docs.map((e) => PostModel.fromMap(e.data())).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  Future<List<PostModel>> getSavedPosts(String userID) async {
+    final userDoc = await _store.collection("users").doc(userID).get();
+    List<String> savedPostIds = List<String>.from(userDoc.data()!["savedPosts"]);
+    if (savedPostIds.isEmpty) return [];
+
+    List<PostModel> posts = [];
+
+    // chunks of 10 (Firestore limit for whereIn)
+    for (var i = 0; i < savedPostIds.length; i += 10) {
+      final chunk = savedPostIds.sublist(i, i + 10 > savedPostIds.length ? savedPostIds.length : i + 10);
+      final response = await _store.collection("posts")
+          .where(FieldPath.documentId, whereIn: chunk).get();
+
+      posts.addAll(response.docs.map((e) => PostModel.fromMap(e.data())));
+    }
+
+    posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return posts;
   }
 
   Future<List<PostModel>> getAllPosts() async{
@@ -152,12 +174,23 @@ class UserProvider extends ChangeNotifier {
   Future<List<UserModel>> getFollowings() async {
     try {
       final response = await _store.collection("users").doc(currentUser!.uid).get();
-      final followingIds = (response.data() as Map<String, dynamic>)["following"] ?? [];
+      final followingIds = List<String>.from((response.data() as Map<String, dynamic>)["following"] ?? []);
+
       if (followingIds.isEmpty) return [];
-      final followingUsers = await _store.collection("users").where("uid", whereIn: followingIds).get();
-      return followingUsers.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
+
+      List<UserModel> followingUsers = [];
+
+      // chunks of 10 (Firestore limit for whereIn)
+      for (var i = 0; i < followingIds.length; i += 10) {
+        final chunk = followingIds.sublist(i, (i + 10 > followingIds.length) ? followingIds.length : i + 10);
+
+        final response = await _store.collection("users").where("uid", whereIn: chunk).get();
+
+        followingUsers.addAll(response.docs.map((doc) => UserModel.fromMap(doc.data())));
+      }
+
+      return followingUsers;
     } catch (e) {
-      print("Error fetching followings: $e");
       return [];
     }
   }
@@ -167,9 +200,6 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
     return response.docs.map((e)=>UserModel.fromMap(e.data())).toList();
   }
-
-  String chatId(String userId) => currentUser!.uid.compareTo(userId) < 0 ?
-    "${currentUser!.uid}\_$userId" : "$userId\_${currentUser!.uid}";
 
   Future<List<StoryModel>> getRecentStories(String userId) async {
     try {
@@ -182,28 +212,34 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-// Future<bool> checkSave({required String userID, required String postID}) async{
-//   final response = await _store.collection("posts").doc(postID).get();
-//
-//   if ((response.data() as dynamic)["saves"].contains(userID)) {
-//     return true;
-//   } else {
-//     return false;
-//   }
-// }
-//
-// Future savePost({required String userID, required String postID}) async{
-//   try{
-//     final response = await _store.collection("posts").doc(postID).get();
-//
-//     if((response.data() as dynamic)["saves"].contains(userID)){
-//       await _store.collection("posts").doc(postID).update({"saves":FieldValue.arrayRemove([userID])});
-//     } else {
-//       await _store.collection("posts").doc(postID).update({"saves":FieldValue.arrayUnion([userID])});
-//     } notifyListeners();
-//   }
-//   catch(e){
-//     print("Something went wrong: ${e.toString()}");
-//   }
-// }
+  Future<bool> checkSave({required String userID, required String postID}) async{
+   final response = await _store.collection("users").doc(userID).get();
+   if ((response.data() as dynamic)["savedPosts"].contains(postID)) return true;
+   return false;
+  }
+
+ Future savePost(context, {required String userID, required String postID}) async{
+   try{
+     final response = await _store.collection("users").doc(userID).get();
+
+     if((response.data() as dynamic)["savedPosts"].contains(postID)){
+       await _store.collection("users").doc(userID).update({"savedPosts":FieldValue.arrayRemove([postID])});
+       showScaffoldMSG(context, "removed_from_saved_posts");
+     } else {
+       await _store.collection("users").doc(userID).update({"savedPosts":FieldValue.arrayUnion([postID])});
+       showScaffoldMSG(context, "added_to_saved_posts");
+     } notifyListeners();
+   }
+   catch(e){
+     showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
+   }
+ }
+
+  Future setLanguage({required String userID, required String language}) async{
+    await _store.collection("users").doc(userID).update({"language": language});
+    notifyListeners();
+  }
+
+  String chatId(String userId) => currentUser!.uid.compareTo(userId) < 0 ?
+  "${currentUser!.uid}\_$userId" : "$userId\_${currentUser!.uid}";
 }

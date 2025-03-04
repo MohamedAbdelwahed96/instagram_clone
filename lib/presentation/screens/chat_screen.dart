@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/chat_model.dart';
@@ -117,12 +118,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ListTile(
                                             onTap: () async{
                                               bool? confirmDelete = await showConfirmationDialog(context,
-                                                  "Delete message", "Are you sure you want to delete this message?");
+                                                  "delete_message".tr(), "confirm_delete_message".tr());
                                               if (confirmDelete == true) await provider.deleteMessage(widget.chatId, messages[index].messageId!);
                                               Navigator.pop(context);
                                             },
                                             leading: Icon(Icons.delete, size: 24, color: theme.primary),
-                                            title: Text("Delete message"),
+                                            title: Text("delete_message".tr()),
                                           ),
                                         ],
                                       ),
@@ -166,7 +167,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         maxLines: 3,
                         controller: formControllers.message,
                         decoration: InputDecoration(
-                          hintText: "Type a message...",
+                          hintText: "type_message".tr(),
                           filled: true,
                           fillColor: theme.inversePrimary,
                           border: OutlineInputBorder(

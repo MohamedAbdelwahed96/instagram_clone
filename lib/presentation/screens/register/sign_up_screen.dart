@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -45,15 +46,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Image.asset("assets/images/Logo.png",
                       width: MediaQuery.of(userContext).size.width * 0.56,
                       color: Theme.of(userContext).colorScheme.primary,),
-                    TextFormfieldWidget(hintText: "Email", controller: emailController,),
+                    TextFormfieldWidget(hintText: "email".tr(), controller: emailController,),
                     SizedBox(height: 21),
-                    TextFormfieldWidget(hintText: "Password", controller: passController, obsecure: true),
+                    TextFormfieldWidget(hintText: "password".tr(), controller: passController, obsecure: true),
                     SizedBox(height: 21),
-                    TextFormfieldWidget(hintText: "Age", controller: ageController),
+                    TextFormfieldWidget(hintText: "age".tr(), controller: ageController),
                     SizedBox(height: 21),
-                    TextFormfieldWidget(hintText: "username", controller: userNameController),
+                    TextFormfieldWidget(hintText: "username".tr(), controller: userNameController),
                     SizedBox(height: 21),
-                    TextFormfieldWidget(hintText: "Full Name", controller: fullNameController),
+                    TextFormfieldWidget(hintText: "full_name".tr(), controller: fullNameController),
                     InkWell(
                       onTap: (){
                         imgProvider.selectMedia(FileType.image);
@@ -85,18 +86,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         userProvider.isLogged?Navigator.pushReplacement(context, CupertinoPageRoute(
                             builder: (context) => NavigationBotBar())):null;
                       },
-                      child: ButtonWidget(text: "Register"),
+                      child: ButtonWidget(text: "register".tr()),
                     ),
                     SizedBox(height: 21),
                     RichText(
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: 'Already have an email?  ',
+                            text: "already_have_an_email".tr(),
                             style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13, color: Theme.of(context).colorScheme.secondary),
                           ),
                           TextSpan(
-                            text: 'Login.',
+                            text: "login".tr(),
                             style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
                             recognizer: TapGestureRecognizer()..onTap = () => Navigator.pushReplacement(userContext, MaterialPageRoute(builder: (context) => LoginScreen(),),),
                           ),

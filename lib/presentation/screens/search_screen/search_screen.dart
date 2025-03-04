@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:instagram_clone/core/controllers.dart';
@@ -57,7 +58,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     suffixIcon: formControllers.search.text.isEmpty?null:IconButton(
                       onPressed: ()=> setState(() => formControllers.search.clear()),
                       icon: Icon(Icons.clear),),
-                    hintText: "Search",
+                    hintText: "search".tr(),
                     hintStyle: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w400,
@@ -85,7 +86,7 @@ class _SearchScreenState extends State<SearchScreen> {
               else if (_users!.isEmpty)
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 28),
-                    child: Text("No results found for ${formControllers.search.text}"),)
+                    child: Text("${"no_results_found".tr()}${formControllers.search.text}"),)
               else
                 Expanded(
                   child: ListView.builder(

@@ -1,9 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/new_post.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_header.dart';
+import 'package:instagram_clone/presentation/screens/profile_screen/profile_liked_posts.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_posts.dart';
+import 'package:instagram_clone/presentation/screens/profile_screen/profile_saved_posts.dart';
 import 'package:instagram_clone/presentation/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -96,8 +99,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             body: TabBarView(
                 children: [
                   ProfilePosts(user: _user!),
-                  ProfilePosts(user: _user!),
-                  ProfilePosts(user: _user!)
+                  LikedPosts(user: _user!),
+                  SavedPosts(user: _user!)
                 ]
             ),
           ),
@@ -122,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       itemBuilder: (context) => [
         PopupMenuItem(value: "Photos", child: Text("Photos & Screens")),
         PopupMenuItem(value: "Videos", child: Text("Videos")),
-        PopupMenuItem(value: "Settings", child: Text("Settings")),
+        PopupMenuItem(value: "Settings", child: Text("settings".tr())),
       ],
     );
   }

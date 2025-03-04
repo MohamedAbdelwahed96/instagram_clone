@@ -11,15 +11,15 @@ import 'package:instagram_clone/presentation/widgets/video_player_widget.dart';
 import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
 
-class ProfilePosts extends StatefulWidget {
+class LikedPosts extends StatefulWidget {
   final UserModel user;
-  const ProfilePosts({super.key, required this.user});
+  const LikedPosts({super.key, required this.user});
 
   @override
-  State<ProfilePosts> createState() => _ProfilePostsState();
+  State<LikedPosts> createState() => _LikedPostsState();
 }
 
-class _ProfilePostsState extends State<ProfilePosts> {
+class _LikedPostsState extends State<LikedPosts> {
   List<PostModel>? _posts;
   List<String>? _mediaUrls;
 
@@ -33,10 +33,10 @@ class _ProfilePostsState extends State<ProfilePosts> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
 
-    List<PostModel> fetchedPosts = await userProvider.getUserPosts(widget.user.uid);
+    List<PostModel> fetchedPosts = await userProvider.getLikedPosts(widget.user.uid);
     List<String> fetchedMediaUrls = await Future.wait(
       fetchedPosts.map((post) async => await mediaProvider.getImage(
-        bucketName: "posts", folderName: post.postId, fileName: post.mediaUrls[0]),
+          bucketName: "posts", folderName: post.postId, fileName: post.mediaUrls[0]),
       ),
     );
 
@@ -54,9 +54,9 @@ class _ProfilePostsState extends State<ProfilePosts> {
         ? GridView.builder(
       physics: BouncingScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 1,
-        mainAxisSpacing: 1),
+          crossAxisCount: 3,
+          crossAxisSpacing: 1,
+          mainAxisSpacing: 1),
       itemCount: _posts!.length,
       itemBuilder: (context, index) {
         String extension = _mediaUrls![index].substring(_mediaUrls![index].lastIndexOf("."));
@@ -64,9 +64,9 @@ class _ProfilePostsState extends State<ProfilePosts> {
         bool isVideo = mimeType.startsWith("video/");
 
         return InkWell(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                PostsScreen(user: widget.user, posts: _posts!,initialIndex: index
-                ))),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>
+              PostsScreen(user: widget.user, posts: _posts!,initialIndex: index
+              ))),
           child: Stack(
             children: [
               SizedBox.expand(

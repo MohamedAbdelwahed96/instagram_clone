@@ -41,7 +41,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Expanded(
                       child: ListTile(
                         leading: Icon(Icons.dark_mode),
-                        title: Text("Dark theme"),
+                        title: Text("dark_theme".tr()),
                       ),
                     ),
                     Switch(
@@ -69,7 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         Navigator.pop(context);
                                       },
                                       leading: Text("EN"),
-                                      title: Text("English"),
+                                      title: Text("english".tr()),
                                     ),
                                     ListTile(
                                       onTap: () {
@@ -78,7 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         Navigator.pop(context);
                                       },
                                       leading: Text("AR"),
-                                      title: Text("Arabic"),
+                                      title: Text("arabic".tr()),
                                     ),
                                   ],
                                 ),
@@ -88,7 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         });
                   },
                   leading: Icon(Icons.language),
-                  title: Text("Change Language"),
+                  title: Text("change_language".tr()),
                 ),
                 ListTile(
                   onTap: ()async{
@@ -97,7 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     });
                   },
                   leading: Icon(Icons.output_rounded),
-                  title: Text("Signout"),
+                  title: Text("signout".tr()),
                 ),
                 Container(height: 1, color: theme.primary.withOpacity(0.15)),
               ],

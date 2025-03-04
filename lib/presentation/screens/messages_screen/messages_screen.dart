@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/chat_screen.dart';
@@ -76,7 +77,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ],
       ),
       body: isLoading ? Center(child: CircularProgressIndicator())
-          : chats.isEmpty ? Center(child: Text("No recent messages"))
+          : chats.isEmpty ? Center(child: Text("no_recent_messages".tr()))
           : ListView.builder(
         itemCount: chats.length,
         itemBuilder: (context, index) {
@@ -87,7 +88,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
             leading: CircleAvatar(
               backgroundImage: NetworkImage(usersPfp[index]!)),
             title: Text(user.fullName),
-            subtitle: Text((chat.senderId == widget.user.uid ? "You: " : "") + chat.message,
+            subtitle: Text((chat.senderId == widget.user.uid ? "${"you".tr()}: " : "") + chat.message,
               style: TextStyle(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
               maxLines: 1, overflow: TextOverflow.ellipsis),
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>

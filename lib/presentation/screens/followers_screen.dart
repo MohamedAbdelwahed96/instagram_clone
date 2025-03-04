@@ -33,7 +33,7 @@ class _FollowersScreenState extends State<FollowersScreen> {
 
   void toggleFollow() async {
     final provider = Provider.of<UserProvider>(context, listen: false);
-    await provider.followProfile(provider.currentUser!.uid, widget.userID);
+    await provider.followProfile(provider.currentUser!.uid, widget.userID, context);
     bool updatedStatus = await provider.checkFollow(provider.currentUser!.uid, widget.userID);
     setState(() {
       isFollowing = updatedStatus;

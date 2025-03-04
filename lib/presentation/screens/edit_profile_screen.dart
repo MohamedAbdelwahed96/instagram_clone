@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
+import 'package:instagram_clone/presentation/screens/profile_screen/profile_screen.dart';
 import '/logic/user_provider.dart';
 import '/presentation/widgets/edit_text_formfield_widget.dart';
 import 'package:provider/provider.dart';
@@ -75,7 +76,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               },
               child: Scaffold(
                 appBar: AppBar(
-                  title: Text('Edit Profile'),
+                  title: Text("edit_profile".tr()),
                   centerTitle: true,
                   leading: IconButton(
                     icon: Icon(Icons.arrow_back),
@@ -104,11 +105,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         await userProvider.saveInfo(context, name, username, web, bio, email, phone, gender, pfpUrl)
                             .then((v) {
                               mediaProvider.mediaFile = null;
-                              Navigator.pop(context);
+                              Navigator.pushReplacement(
+                                  context, MaterialPageRoute(builder: (context)=>ProfileScreen(profileID: user!.uid)));
                             });
               
                       },
-                      child: Text('Done', style: TextStyle(color: Colors.blue)),
+                      child: Text("done".tr(), style: TextStyle(color: Colors.blue)),
                     ),
                   ],
                 ),
@@ -131,30 +133,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             onPressed: () async{
                               await mediaProvider.selectMedia(FileType.image);
                             },
-                            child: Text('Change Profile Photo', style: TextStyle(color: Colors.blue)),
+                            child: Text("change_profile_photo".tr(), style: TextStyle(color: Colors.blue)),
                           ),
                         ),
-                        EditTextFormfieldWidget(name: "Name", controller: formControllers.name),
-                        EditTextFormfieldWidget(name: "Username", controller: formControllers.username,
+                        EditTextFormfieldWidget(name: "name", controller: formControllers.name),
+                        EditTextFormfieldWidget(name: "username", controller: formControllers.username,
                           inputFormats: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],),
-                        EditTextFormfieldWidget(name: "Website", controller: formControllers.website,
+                        EditTextFormfieldWidget(name: "website", controller: formControllers.website,
                           inputFormats: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],),
-                        EditTextFormfieldWidget(name: "Bio", controller: formControllers.bio, maxLines: 2, lineEnabled: false),
+                        EditTextFormfieldWidget(name: "bio", controller: formControllers.bio, maxLines: 2, lineEnabled: false),
                         Container(height: 1, color: Theme.of(context).colorScheme.primary.withOpacity(0.15)),
                         SizedBox(height: 20),
                         InkWell(
                           onTap: () {},
-                          child: Text('Switch to Professional Account',
+                          child: Text("switch_to_professional_account".tr(),
                               style: TextStyle(color: Colors.blue, fontSize: 15, fontWeight: FontWeight.w400)),),
                         SizedBox(height: 29),
-                        Text('Private Information'.tr(),
+                        Text("private_information".tr(),
                           style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
                         SizedBox(height: 14),
-                        EditTextFormfieldWidget(name: "Email", controller: formControllers.email,),
-                        EditTextFormfieldWidget(name: "Phone", controller: formControllers.phone,
+                        EditTextFormfieldWidget(name: "email", controller: formControllers.email,),
+                        EditTextFormfieldWidget(name: "phone", controller: formControllers.phone,
                           keyboardType: TextInputType.number,
                           inputFormats: [FilteringTextInputFormatter.digitsOnly],),
-                        EditTextFormfieldWidget(name: "Gender", controller: formControllers.gender, dropDown: true, lineEnabled: false),
+                        EditTextFormfieldWidget(name: "gender", controller: formControllers.gender, dropDown: true, lineEnabled: false),
                       ],
                     ),
                   ),
