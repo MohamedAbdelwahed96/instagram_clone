@@ -13,6 +13,7 @@ import 'package:instagram_clone/presentation/widgets/scaffold_msg.dart';
 
 class MediaProvider extends ChangeNotifier{
   final _supa = Supabase.instance.client.storage;
+  final _store = FirebaseFirestore.instance;
   String? filename;
   List<String> media=[];
   PlatformFile? mediaFile;
@@ -106,8 +107,8 @@ class MediaProvider extends ChangeNotifier{
   Future uploadPost(context, PostModel post) async {
     final user = Provider.of<UserProvider>(context, listen: false).currentUser;
     try{
-      await FirebaseFirestore.instance.collection('posts').doc(post.postId).set(post.toMap());
-      await FirebaseFirestore.instance.collection("users").doc(user!.uid).update({"posts":FieldValue.arrayUnion([post.postId])});
+      await _store.collection('posts').doc(post.postId).set(post.toMap());
+      await _store.collection("users").doc(user!.uid).update({"posts":FieldValue.arrayUnion([post.postId])});
       showScaffoldMSG(context, "uploaded_successfully");
     }
     catch(e){
@@ -119,8 +120,8 @@ class MediaProvider extends ChangeNotifier{
   Future deletePost(context, PostModel post) async {
     try{
       final user = Provider.of<UserProvider>(context, listen: false).currentUser!.uid;
-      await FirebaseFirestore.instance.collection('posts').doc(post.postId).delete();
-      await FirebaseFirestore.instance.collection("users").doc(user).update({"posts":FieldValue.arrayRemove([post.postId])});
+      await _store.collection('posts').doc(post.postId).delete();
+      await _store.collection("users").doc(user).update({"posts":FieldValue.arrayRemove([post.postId])});
       await _supa.from("posts").remove(post.mediaUrls.map((file) => "${post.postId}/$file").toList());
       showScaffoldMSG(context, "deleted_successfully");
     }
@@ -133,8 +134,8 @@ class MediaProvider extends ChangeNotifier{
   Future uploadStory(context, StoryModel story) async {
     final user = Provider.of<UserProvider>(context, listen: false).currentUser;
     try{
-      await FirebaseFirestore.instance.collection('stories').doc(story.storyId).set(story.toMap());
-      await FirebaseFirestore.instance.collection("users").doc(user!.uid).update({"stories":FieldValue.arrayUnion([story.storyId])});
+      await _store.collection('stories').doc(story.storyId).set(story.toMap());
+      await _store.collection("users").doc(user!.uid).update({"stories":FieldValue.arrayUnion([story.storyId])});
       showScaffoldMSG(context, "uploaded_successfully");
     }
     catch(e){
@@ -146,8 +147,8 @@ class MediaProvider extends ChangeNotifier{
   Future deleteStory(context, StoryModel story) async {
     try{
       final user = Provider.of<UserProvider>(context, listen: false).currentUser!.uid;
-      await FirebaseFirestore.instance.collection('stories').doc(story.storyId).delete();
-      await FirebaseFirestore.instance.collection("users").doc(user).update({"stories":FieldValue.arrayRemove([story.storyId])});
+      await _store.collection('stories').doc(story.storyId).delete();
+      await _store.collection("users").doc(user).update({"stories":FieldValue.arrayRemove([story.storyId])});
       await _supa.from("stories").remove(["${story.storyId}/${story.mediaUrl}"]);
       showScaffoldMSG(context, "deleted_successfully");
     }
@@ -160,8 +161,8 @@ class MediaProvider extends ChangeNotifier{
   Future uploadReel(context, ReelModel reel) async {
     final user = Provider.of<UserProvider>(context, listen: false).currentUser;
     try{
-      await FirebaseFirestore.instance.collection('reels').doc(reel.reelId).set(reel.toMap());
-      await FirebaseFirestore.instance.collection("users").doc(user!.uid).update({"reels":FieldValue.arrayUnion([reel.reelId])});
+      await _store.collection('reels').doc(reel.reelId).set(reel.toMap());
+      await _store.collection("users").doc(user!.uid).update({"reels":FieldValue.arrayUnion([reel.reelId])});
       showScaffoldMSG(context, "uploaded_successfully");
     }
     catch(e){
@@ -173,8 +174,8 @@ class MediaProvider extends ChangeNotifier{
   Future deleteReel(context, ReelModel reel) async {
     try{
       final user = Provider.of<UserProvider>(context, listen: false).currentUser!.uid;
-      await FirebaseFirestore.instance.collection('reels').doc(reel.reelId).delete();
-      await FirebaseFirestore.instance.collection("users").doc(user).update({"reels":FieldValue.arrayRemove([reel.reelId])});
+      await _store.collection('reels').doc(reel.reelId).delete();
+      await _store.collection("users").doc(user).update({"reels":FieldValue.arrayRemove([reel.reelId])});
       await _supa.from("reels").remove(["${reel.reelId}/${reel.videoUrl}"]);
       showScaffoldMSG(context, "deleted_successfully");
     }

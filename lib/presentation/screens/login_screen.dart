@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/core/controllers.dart';
 import '/logic/user_provider.dart';
-import '/presentation/screens/register/sign_up_screen.dart';
+import 'sign_up_screen.dart';
 import '/presentation/widgets/button_widget.dart';
 import '/presentation/widgets/navigation_bot_bar.dart';
 import '/presentation/widgets/text_formfield_widget.dart';
