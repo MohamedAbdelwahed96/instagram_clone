@@ -93,7 +93,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   String pfpUrl = user!.pfpUrl;
 
                   if (mediaProvider.mediaFile != null) {
-                    await mediaProvider.uploadImage(context, bucketName: "images", folder: "uploads");
+                    await mediaProvider.uploadMedia(context, bucketName: "images", folder: "uploads");
                     pfpUrl = mediaProvider.filename ?? pfpUrl;
                   }
 

@@ -7,7 +7,6 @@ import 'package:instagram_clone/data/reel_model.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
-import 'package:instagram_clone/presentation/widgets/button_widget.dart';
 import 'package:instagram_clone/presentation/widgets/navigation_bot_bar.dart';
 import 'package:instagram_clone/presentation/widgets/video_player_widget.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +22,6 @@ class NewReel extends StatefulWidget {
 class _NewReelState extends State<NewReel> {
   final formControllers = FormControllers();
   UserModel? user;
-  bool _isUploading = false;
 
   @override
   void initState() {
@@ -45,21 +43,34 @@ class _NewReelState extends State<NewReel> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
     return Consumer<MediaProvider>(builder: (context, provider, _){
+      final theme = Theme.of(context).colorScheme;
       return Scaffold(
         appBar: AppBar(
           title: Text("new_reel".tr()),
           centerTitle: true,
           leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: ()=> Navigator.pop(context)),
           actions: [
-            _isUploading
+            provider.uploadProgress > 0 && provider.uploadProgress < 1.0
                 ? Padding(
               padding: const EdgeInsets.only(right: 16),
-              child: CircularProgressIndicator(color: Colors.white),)
+              child: CircularProgressIndicator())
                 : IconButton(
-              icon: Icon(Icons.upload),
-              onPressed: (){}, // upload post
+              icon: Icon(Icons.upload, color: provider.mediaFile != null ? theme.primary : theme.primary.withOpacity(0.5)),
+              onPressed: provider.mediaFile == null ? null
+                  : () async{
+                final reelID = const Uuid().v1();
+                await provider.uploadMedia(context, bucketName: "reels", folder: reelID);
+                if (provider.filename == null) return;
+                await provider.uploadReel(context,
+                    ReelModel(
+                        reelId: reelID,
+                        userId: user!.uid,
+                        videoUrl: provider.filename!,
+                        createdAt: DateTime.now(),
+                        caption: formControllers.caption.text));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBotBar()));
+              },
             ),
           ],
         ),
@@ -74,37 +85,18 @@ class _NewReelState extends State<NewReel> {
                       ? Center(child: IconButton(
                       onPressed: () async => await provider.selectMedia(FileType.video),
                       icon: Icon(Icons.add_a_photo, size: 50, color: theme.secondary)),)
-                      : VideoPlayerWidget(videoFile: File(provider.mediaFile!.path!))
+                      : VideoPlayerWidget(videoFile: File(provider.mediaFile!.path!), tapToPlayPause: true)
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               child: TextField(
                 controller: formControllers.caption,
+                maxLines: 3,
                 decoration: InputDecoration(
                   hintText: "write_caption".tr(),
                   border: OutlineInputBorder(),
                 ),
-                maxLines: 3,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              child: InkWell(
-                onTap: () async{
-                  final reelID = const Uuid().v1();
-                  await provider.uploadImage(context, bucketName: "reels", folder: reelID);
-                  if (provider.filename == null) return;
-                  await provider.uploadReel(context,
-                      ReelModel(
-                          reelId: reelID,
-                          userId: user!.uid,
-                          videoUrl: provider.filename!,
-                          createdAt: DateTime.now(),
-                          caption: formControllers.caption.text));
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBotBar()));
-                }, // upload post
-                child: ButtonWidget(text: "post".tr()),
               ),
             ),
           ],

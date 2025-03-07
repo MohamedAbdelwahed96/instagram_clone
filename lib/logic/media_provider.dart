@@ -17,6 +17,12 @@ class MediaProvider extends ChangeNotifier{
   List<String> media=[];
   PlatformFile? mediaFile;
   List<PlatformFile> mediaFiles=[];
+  double uploadProgress = 0;
+
+  void _setProgress(double progress) {
+    uploadProgress = progress;
+    notifyListeners();
+  }
 
   Future selectMedia(FileType type, {bool multiple = false}) async {
     final response = await FilePicker.platform.pickFiles(type: type, allowMultiple: multiple);
@@ -30,23 +36,27 @@ class MediaProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  Future uploadImage(context, {required String bucketName, required String folder}) async {
+  Future uploadMedia(context, {required String bucketName, required String folder}) async {
     if (mediaFile == null) {
       showScaffoldMSG(context, "no_image_attached");
       return;
     }
     try {
       filename = "${DateTime.now().millisecondsSinceEpoch}.${mediaFile!.extension}";
+      _setProgress(0.1);
       await _supa.from(bucketName).upload("$folder/$filename", File(mediaFile!.path!));
+      _setProgress(1);
       showScaffoldMSG(context, "uploaded_successfully");
       notifyListeners();
       mediaFile = null;
     } catch (e) {
       showScaffoldMSG(context, "${"upload_failed".tr()}: ${e.toString()}");
+    } finally {
+      _setProgress(0.0);
     }
   }
 
-  Future uploadMedia(BuildContext context, String id) async {
+  Future uploadMultimedia(BuildContext context, String id) async {
     if (mediaFiles.isEmpty) {
       showScaffoldMSG(context, "no_media_attached");
       return;
@@ -57,13 +67,17 @@ class MediaProvider extends ChangeNotifier{
         if (file.path == null) continue;
         filename = "${DateTime.now().millisecondsSinceEpoch}.${file.extension}";
         media.add(filename!);
+        _setProgress(0.1);
         await _supa.from("posts").upload("$id/$filename", File(file.path!));
+        _setProgress(1);
       }
       showScaffoldMSG(context, "uploaded_successfully");
       notifyListeners();
       mediaFiles.clear();
     } catch (e) {
       showScaffoldMSG(context, "${"upload_failed".tr()}: ${e.toString()}");
+    } finally {
+      _setProgress(0.0);
     }
   }
 

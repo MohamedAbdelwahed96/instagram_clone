@@ -44,7 +44,6 @@ class ChatProvider extends ChangeNotifier {
       }
     });
 
-    // Convert to list and sort by most recent timeSent
     return lastMessages.values.toList()
       ..sort((a, b) => b.timeSent.compareTo(a.timeSent));
   }
@@ -54,19 +53,14 @@ class ChatProvider extends ChangeNotifier {
     await msg.set(message.toMap());
     await msg.update({"messageId": msg.key});
 
-
-    // Fetch recipient's FCM token from Firestore
-    DocumentSnapshot userDoc =
-    await _store.collection("users").doc(message.receiverId).get();
+    final userDoc = await _store.collection("users").doc(message.receiverId).get();
     String? fcmToken = userDoc.exists ? userDoc["fcmToken"] : null;
 
     if (fcmToken != null) {
-      // Send push notification using NotificationService
       NotificationService.instance.sendPushNotification(
-        fcmToken: fcmToken,
-        senderId: message.senderId,
-        message: message.message,
-      );
+          fcmToken: fcmToken,
+          senderId: message.senderId,
+          message: message.message);
     }
   }
 

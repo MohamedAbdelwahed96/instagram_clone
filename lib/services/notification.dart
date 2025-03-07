@@ -109,8 +109,7 @@ class NotificationService {
     required String message,
   }) async {
     try {
-      // Firebase Cloud Messaging API Key (Replace with your actual key)
-      const String serverKey = "YOUR_SERVER_KEY_HERE";
+      const String serverKey = "API Key";
       const String fcmUrl = "https://fcm.googleapis.com/fcm/send";
 
       // Notification payload

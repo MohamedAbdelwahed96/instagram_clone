@@ -8,7 +8,6 @@ import 'package:instagram_clone/data/story_model.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
-import 'package:instagram_clone/presentation/widgets/button_widget.dart';
 import 'package:instagram_clone/presentation/widgets/navigation_bot_bar.dart';
 import 'package:instagram_clone/presentation/widgets/video_player_widget.dart';
 import 'package:mime/mime.dart';
@@ -25,7 +24,6 @@ class NewStory extends StatefulWidget {
 class _NewStoryState extends State<NewStory> {
   final formControllers = FormControllers();
   UserModel? user;
-  bool _isUploading = false;
   bool _isVideo = false;
 
   @override
@@ -49,19 +47,33 @@ class _NewStoryState extends State<NewStory> {
   @override
   Widget build(BuildContext context) {
     return Consumer<MediaProvider>(builder: (context, provider, _){
+      final theme = Theme.of(context).colorScheme;
       return Scaffold(
         appBar: AppBar(
           title: Text("add_to_story".tr()),
           centerTitle: true,
           leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: ()=> Navigator.pop(context)),
           actions: [
-            _isUploading
+            provider.uploadProgress > 0 && provider.uploadProgress < 1.0
                 ? Padding(
               padding: const EdgeInsets.only(right: 16.0),
-              child: CircularProgressIndicator(color: Colors.white),)
+              child: CircularProgressIndicator())
                 : IconButton(
-              icon: Icon(Icons.upload),
-              onPressed: (){}, // upload post
+              icon: Icon(Icons.upload, color: provider.mediaFile != null ? theme.primary : theme.primary.withOpacity(0.5)),
+              onPressed: provider.mediaFile == null ? null
+                  : () async {final storyID = const Uuid().v1();
+                await provider.uploadMedia(context, bucketName: "stories", folder: storyID);
+                if (provider.filename == null) return;
+                await provider.uploadStory(context,
+                    StoryModel(
+                        storyId: storyID,
+                        userId: user!.uid,
+                        mediaUrl: provider.filename!,
+                        isVideo: _isVideo,
+                        createdAt: DateTime.now())
+                );
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBotBar()));
+              },
             ),
           ],
         ),
@@ -71,38 +83,18 @@ class _NewStoryState extends State<NewStory> {
               child: Container(
                 height: MediaQuery.of(context).size.height*0.3,
                 width: MediaQuery.of(context).size.width,
-                color: Theme.of(context).colorScheme.inversePrimary,
+                color: theme.inversePrimary,
                 child: provider.mediaFile==null
                     ? Center(child: IconButton(
                     onPressed: () async {
                       await provider.selectMedia(FileType.media);
                       setState(() => _isVideo = lookupMimeType(provider.mediaFile!.path!)!.startsWith("video/"));
                     },
-                    icon: Icon(Icons.add_a_photo, size: 50, color: Theme.of(context).colorScheme.secondary)),) :
-                _isVideo?
+                    icon: Icon(Icons.add_a_photo, size: 50, color: theme.secondary)),) :
+                _isVideo ?
                 VideoPlayerWidget(videoFile: File(provider.mediaFile!.path!)):
                 // lookupMimeType(provider.mediaFile!.path!)!.startsWith("image/")?
                 Image.file(File(provider.mediaFile!.path!), fit: BoxFit.fitHeight)
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              child: InkWell(
-                onTap: () async{
-                  final storyID = const Uuid().v1();
-                  await provider.uploadImage(context, bucketName: "stories", folder: storyID);
-                  if (provider.filename == null) return;
-                  await provider.uploadStory(context,
-                      StoryModel(
-                          storyId: storyID,
-                          userId: user!.uid,
-                          mediaUrl: provider.filename!,
-                          isVideo: _isVideo,
-                          createdAt: DateTime.now())
-                  );
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBotBar()));
-                }, // upload post
-                child: ButtonWidget(text: "post".tr()),
               ),
             ),
           ],
