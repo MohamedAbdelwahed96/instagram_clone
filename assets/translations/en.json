@@ -15,6 +15,7 @@
   "private_information": "Private Information",
   "new_post": "New Post",
   "add_to_story": "Add to story",
+  "new_reel": "New reel",
   "settings": "Settings",
   "dark_theme": "Dark theme",
   "english": "English",
@@ -74,5 +75,18 @@
   "uploaded_successfully": "Uploaded Successfully",
   "upload_failed": "Upload failed: ",
   "no_media_attached": "No media attached",
-  "deleted_successfully": "Deleted Successfully"
+  "deleted_successfully": "Deleted Successfully",
+  "create": "Create",
+  "new reel": "Reel",
+  "new post": "Post",
+  "new story": "Story",
+  "comments": "comments",
+  "views": "views",
+  "saved": "Saved Posts",
+  "favorite": "Favorite Posts",
+  "coming_soon": "Coming soon",
+  "tagged_media": "Photos and videos of you\n",
+  "tagged_desc": "When people tag you in photos and videos,\nthey'll appear here.",
+  "password_updated": "Password updated successfully",
+  "password_reset": "Password reset link has been sent to your email"
 }

@@ -2,12 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
-import 'package:instagram_clone/presentation/screens/new_post.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_header.dart';
-import 'package:instagram_clone/presentation/screens/profile_screen/profile_liked_posts.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_posts.dart';
-import 'package:instagram_clone/presentation/screens/profile_screen/profile_saved_posts.dart';
+import 'package:instagram_clone/presentation/screens/profile_screen/profile_reels.dart';
+import 'package:instagram_clone/presentation/screens/profile_screen/tagged_posts.dart';
 import 'package:instagram_clone/presentation/screens/settings_screen.dart';
+import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
+import 'package:instagram_clone/presentation/widgets/scaffold_msg.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -55,13 +56,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             :AppBar(
           title: Text(_user!.username, style: TextStyle(fontWeight: FontWeight.bold)),
           actions: [
+            IconsWidget(icon: "new_post",
+              onTap: ()=> addNew(context),),
+            SizedBox(width: 8),
             IconButton(
-              icon: Icon(Icons.add_box_outlined),
-              onPressed: () => Navigator.push(
-                  context, MaterialPageRoute(builder: (context)=>NewPostScreen())),
-            ),
-            IconButton(
-              icon: Icon(Icons.menu),
+              icon: Icon(Icons.menu, size: 32),
               onPressed: () => Navigator.push(
                   context, MaterialPageRoute(builder: (context)=>SettingsScreen(user: _user!))),
             ),
@@ -84,8 +83,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       TabBar(
                         tabs: [
                           Tab(icon: Icon(Icons.grid_on)),
-                          Tab(icon: Icon(Icons.favorite_border_outlined)),
-                          Tab(icon: Icon(Icons.bookmark_border)),
+                          Tab(icon: ImageIcon(AssetImage("assets/icons/reels.png"))),
+                          Tab(icon: Icon(Icons.person_pin_outlined)),
                         ],
                         indicatorSize: TabBarIndicatorSize.tab,
                         unselectedLabelColor: Color.fromRGBO(196, 196, 196, 1),
@@ -99,8 +98,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             body: TabBarView(
                 children: [
                   ProfilePosts(user: _user!),
-                  LikedPosts(user: _user!),
-                  SavedPosts(user: _user!)
+                  ProfileReels(user: _user!),
+                  TaggedPosts(user: _user!)
                 ]
             ),
           ),

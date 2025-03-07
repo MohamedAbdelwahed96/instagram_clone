@@ -55,6 +55,7 @@ dependencies:
   timeago: ^3.7.0
   percent_indicator: ^4.2.4
   shared_preferences: ^2.5.2
+  visibility_detector: ^0.4.0+2
 
 dev_dependencies:
   flutter_test:

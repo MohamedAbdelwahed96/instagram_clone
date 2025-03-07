@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       IconsWidget(icon: "chat",
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => MessagesScreen(user: users![0],))),),
                       SizedBox(width: 24),
-                      IconsWidget(icon: "new_story",
+                      IconsWidget(icon: "new_post",
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewPostScreen())),),
                     ],
                   ),

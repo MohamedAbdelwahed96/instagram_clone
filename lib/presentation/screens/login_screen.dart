@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/core/controllers.dart';
-import '/presentation/widgets/floating_button_widget.dart';
 import '/logic/user_provider.dart';
 import '/presentation/screens/register/sign_up_screen.dart';
 import '/presentation/widgets/button_widget.dart';
@@ -30,7 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingButtonWidget(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),

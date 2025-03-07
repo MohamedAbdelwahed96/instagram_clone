@@ -41,33 +41,31 @@ class _PostsScreenState extends State<PostsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-            title: Text("posts".tr(),
-                style: TextStyle(fontWeight: FontWeight.bold)),
-          scrolledUnderElevation: 0,
-        ),
-        body: CustomScrollView(
-          controller: _scrollController,
-          physics: BouncingScrollPhysics(),
-          slivers: [
-            SliverToBoxAdapter(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: widget.user.posts.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      key: _postKeys[index],
-                      child: PostWidget(post: widget.posts[index]),
-                    );
-                  },
-                )
-            )
-          ],
-        ),
+    return Scaffold(
+      appBar: AppBar(
+          title: Text("posts".tr(),
+              style: TextStyle(fontWeight: FontWeight.bold)),
+        scrolledUnderElevation: 0,
+      ),
+      body: CustomScrollView(
+        controller: _scrollController,
+        physics: BouncingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(
+              child: ListView.builder(
+                controller: _scrollController,
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: widget.user.posts.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    key: _postKeys[index],
+                    child: PostWidget(post: widget.posts[index]),
+                  );
+                },
+              )
+          )
+        ],
       ),
     );
   }

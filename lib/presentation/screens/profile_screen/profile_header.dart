@@ -5,7 +5,6 @@ import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/chat_screen.dart';
 import 'package:instagram_clone/presentation/screens/edit_profile_screen.dart';
-import 'package:instagram_clone/presentation/screens/login_screen.dart';
 import 'package:instagram_clone/presentation/skeleton_loading/profile_header_loading.dart';
 import 'package:provider/provider.dart';
 
@@ -40,11 +39,10 @@ class _ProfileHeaderState extends State<ProfileHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
-
     if (img == null) return SkeletonProfileHeader();
 
     return Consumer<UserProvider>(builder: (context, provider, _){
+      final theme = Theme.of(context).colorScheme;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -122,11 +120,10 @@ class _ProfileHeaderState extends State<ProfileHeader> {
             children: [
               Expanded(
                 child: InkWell(
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfileScreen()));
-                  },
+                  onTap: () => Navigator.pushReplacement(
+                      context, MaterialPageRoute(builder: (context) => EditProfileScreen())),
                   child: Container(
-                    height: 45,
+                    height: MediaQuery.of(context).size.height*0.05,
                     decoration: BoxDecoration(
                       color: Color.fromRGBO(239, 239, 239, 0.2),
                       borderRadius: BorderRadius.circular(8),
@@ -138,19 +135,15 @@ class _ProfileHeaderState extends State<ProfileHeader> {
               ),
               SizedBox(width: 10),
               InkWell(
-                onTap: () {
-                  provider.signOut(context).then((v){
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
-                  });
-                },
+                onTap: () {},
                 child: Container(
-                    width: MediaQuery.of(context).size.width*0.08,
-                    height: 45,
+                    width: MediaQuery.of(context).size.height*0.05,
+                    height: MediaQuery.of(context).size.height*0.05,
                     decoration: BoxDecoration(
                       color: Color.fromRGBO(239, 239, 239, 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(Icons.output_rounded, color: theme.primary)),
+                    child: Icon(Icons.person_add)),
               ),
             ],
           ),
@@ -173,79 +166,12 @@ class _ProfileHeaderState extends State<ProfileHeader> {
       }
     });
   }
-
-  Widget _buildFollowButtons() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: InkWell(
-            onTap: toggleFollow,
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: isFollowing ? Color.fromRGBO(239, 239, 239, 0.2) : Color.fromRGBO(0, 163, 255, 1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              alignment: Alignment.center,
-              child: Text(isFollowing ? "unfollow".tr() : "follow".tr(),
-                  style: TextStyle(color: isFollowing ? Colors.black : Colors.white)),
-            ),
-          ),
-        ),
-        SizedBox(width: isFollowing ? 10 : 0),
-        isFollowing
-            ? Expanded(
-          flex: 1,
-          child: InkWell(
-            onTap: () {},
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(239, 239, 239, 0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              alignment: Alignment.center,
-              child: Text("message".tr(), style: TextStyle(color: Colors.black)),
-            ),
-          ),
-        )
-            : SizedBox(),
-      ],
-    );
-  }
-
-  Widget _buildEditProfileButtons() {
-    return Row(
-      children: [
-        Expanded(
-          child: InkWell(
-            onTap: () {},
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(239, 239, 239, 0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              alignment: Alignment.center,
-              child: Text('Edit Profile', style: TextStyle(color: Colors.black)),
-            ),
-          ),
-        ),
-        SizedBox(width: 10),
-        IconButton(
-          icon: Icon(Icons.output_rounded, color: Colors.black),
-          onPressed: () {},
-        ),
-      ],
-    );
-  }
 }
 
-Widget profileStat(int number, String label) {
+Widget profileStat(int count, String label) {
   return Column(
     children: [
-      Text(number.toString(), style: TextStyle(fontWeight: FontWeight.w700)),
+      Text(count.toString(), style: TextStyle(fontWeight: FontWeight.w700)),
       Text(label.tr()),
     ],
   );

@@ -8,6 +8,7 @@ import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_screen.dart';
+import 'package:instagram_clone/presentation/widgets/navigation_bot_bar.dart';
 import '/logic/user_provider.dart';
 import '/presentation/widgets/edit_text_formfield_widget.dart';
 import 'package:provider/provider.dart';
@@ -50,15 +51,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    if (user == null) return Center(child: CircularProgressIndicator());
 
-    return Consumer<UserProvider>(
-        builder: (userContext, userProvider, _){
-          
-          if (user == null) {
-            return Center(child: CircularProgressIndicator());
-          }
-
+    return Consumer2<UserProvider, MediaProvider>(
+        builder: (context, userProvider, mediaProvider, _){
+          final theme = Theme.of(context).colorScheme;
           formControllers.name.text = user!.fullName;
           formControllers.username.text = user!.username;
           formControllers.website.text = user!.website;
@@ -66,104 +63,101 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           formControllers.email.text = user!.email;
           formControllers.phone.text = user!.pNumber;
           formControllers.gender.text = user!.gender;
-
-          return Consumer<MediaProvider>(builder: (mediaContext, mediaProvider, img_){
-            return PopScope(
-              canPop: true,
-              onPopInvokedWithResult: (didPop, result) {
-                if (!didPop) return;
+      return PopScope(
+        canPop: true,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) return;
+          mediaProvider.mediaFile = null;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text("edit_profile".tr()),
+            centerTitle: true,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
                 mediaProvider.mediaFile = null;
+                Navigator.pop(context);
               },
-              child: Scaffold(
-                appBar: AppBar(
-                  title: Text("edit_profile".tr()),
-                  centerTitle: true,
-                  leading: IconButton(
-                    icon: Icon(Icons.arrow_back),
-                    onPressed: () {
-                      mediaProvider.mediaFile = null;
-                      Navigator.pop(context);
-                    },
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () async{
-                        final String name = formControllers.name.text,
-                            username = formControllers.username.text,
-                            web = formControllers.website.text,
-                            bio = formControllers.bio.text,
-                            email = formControllers.email.text,
-                            phone = formControllers.phone.text,
-                            gender = formControllers.gender.text;
-                        String pfpUrl = user!.pfpUrl;
-              
-                        if (mediaProvider.mediaFile != null) {
-                          await mediaProvider.uploadImage(context, bucketName: "images", folder: "uploads");
-                          pfpUrl = mediaProvider.filename ?? pfpUrl;
-                        }
-              
-                        await userProvider.saveInfo(context, name, username, web, bio, email, phone, gender, pfpUrl)
-                            .then((v) {
-                              mediaProvider.mediaFile = null;
-                              Navigator.pushReplacement(
-                                  context, MaterialPageRoute(builder: (context)=>ProfileScreen(profileID: user!.uid)));
-                            });
-              
-                      },
-                      child: Text("done".tr(), style: TextStyle(color: Colors.blue)),
-                    ),
-                  ],
-                ),
-                body: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: theme.inversePrimary,
-                            backgroundImage:
-                            mediaProvider.mediaFile==null?NetworkImage(img!):FileImage(File(mediaProvider.mediaFile!.path!)),
-                          ),
-                        ),
-                        Center(
-                          child: TextButton(
-                            onPressed: () async{
-                              await mediaProvider.selectMedia(FileType.image);
-                            },
-                            child: Text("change_profile_photo".tr(), style: TextStyle(color: Colors.blue)),
-                          ),
-                        ),
-                        EditTextFormfieldWidget(name: "name", controller: formControllers.name),
-                        EditTextFormfieldWidget(name: "username", controller: formControllers.username,
-                          inputFormats: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],),
-                        EditTextFormfieldWidget(name: "website", controller: formControllers.website,
-                          inputFormats: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],),
-                        EditTextFormfieldWidget(name: "bio", controller: formControllers.bio, maxLines: 2, lineEnabled: false),
-                        Container(height: 1, color: Theme.of(context).colorScheme.primary.withOpacity(0.15)),
-                        SizedBox(height: 20),
-                        InkWell(
-                          onTap: () {},
-                          child: Text("switch_to_professional_account".tr(),
-                              style: TextStyle(color: Colors.blue, fontSize: 15, fontWeight: FontWeight.w400)),),
-                        SizedBox(height: 29),
-                        Text("private_information".tr(),
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
-                        SizedBox(height: 14),
-                        EditTextFormfieldWidget(name: "email", controller: formControllers.email,),
-                        EditTextFormfieldWidget(name: "phone", controller: formControllers.phone,
-                          keyboardType: TextInputType.number,
-                          inputFormats: [FilteringTextInputFormatter.digitsOnly],),
-                        EditTextFormfieldWidget(name: "gender", controller: formControllers.gender, dropDown: true, lineEnabled: false),
-                      ],
-                    ),
-                  ),
-                ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async{
+                  final String name = formControllers.name.text,
+                      username = formControllers.username.text,
+                      web = formControllers.website.text,
+                      bio = formControllers.bio.text,
+                      email = formControllers.email.text,
+                      phone = formControllers.phone.text,
+                      gender = formControllers.gender.text;
+                  String pfpUrl = user!.pfpUrl;
+
+                  if (mediaProvider.mediaFile != null) {
+                    await mediaProvider.uploadImage(context, bucketName: "images", folder: "uploads");
+                    pfpUrl = mediaProvider.filename ?? pfpUrl;
+                  }
+
+                  await userProvider.saveInfo(context, name, username, web, bio, email, phone, gender, pfpUrl)
+                      .then((v) {
+                    mediaProvider.mediaFile = null;
+                    Navigator.pushReplacement(
+                        context, MaterialPageRoute(builder: (context)=>NavigationBotBar(index: 4)));
+                  });
+
+                },
+                child: Text("done".tr(), style: TextStyle(color: Colors.blue)),
               ),
-            );
-          });
-        });
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: theme.inversePrimary,
+                      backgroundImage:
+                      mediaProvider.mediaFile==null?NetworkImage(img!):FileImage(File(mediaProvider.mediaFile!.path!)),
+                    ),
+                  ),
+                  Center(
+                    child: TextButton(
+                      onPressed: () async{
+                        await mediaProvider.selectMedia(FileType.image);
+                      },
+                      child: Text("change_profile_photo".tr(), style: TextStyle(color: Colors.blue)),
+                    ),
+                  ),
+                  EditTextFormfieldWidget(name: "name", controller: formControllers.name),
+                  EditTextFormfieldWidget(name: "username", controller: formControllers.username,
+                    inputFormats: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],),
+                  EditTextFormfieldWidget(name: "website", controller: formControllers.website,
+                    inputFormats: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],),
+                  EditTextFormfieldWidget(name: "bio", controller: formControllers.bio, maxLines: 2, lineEnabled: false),
+                  Container(height: 1, color: Theme.of(context).colorScheme.primary.withOpacity(0.15)),
+                  SizedBox(height: 20),
+                  InkWell(
+                    onTap: () {},
+                    child: Text("switch_to_professional_account".tr(),
+                        style: TextStyle(color: Colors.blue, fontSize: 15, fontWeight: FontWeight.w400)),),
+                  SizedBox(height: 29),
+                  Text("private_information".tr(),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
+                  SizedBox(height: 14),
+                  EditTextFormfieldWidget(name: "email", controller: formControllers.email,),
+                  EditTextFormfieldWidget(name: "phone", controller: formControllers.phone,
+                    keyboardType: TextInputType.number,
+                    inputFormats: [FilteringTextInputFormatter.digitsOnly],),
+                  EditTextFormfieldWidget(name: "gender", controller: formControllers.gender, dropDown: true, lineEnabled: false),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 }

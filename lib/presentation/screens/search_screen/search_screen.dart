@@ -73,29 +73,26 @@ class _SearchScreenState extends State<SearchScreen> {
                   _users = await provider.searchUsers(context, formControllers.search.text),
                 ),
               ),
-              if (formControllers.search.text.isEmpty)
                 Expanded(
-                    child: MasonryGridView.builder(
+                    child: formControllers.search.text.isEmpty ?
+                    GridView.builder(
                       itemCount: _posts!.length,
-                      gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-                      mainAxisSpacing: 2,
-                      crossAxisSpacing: 2,
-                      itemBuilder: (context, index){
-                        return PostsResults(model: _posts![index]);
-                      },
-                    ))
-              else if (_users!.isEmpty)
-                Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28),
-                    child: Text("${"no_results_found".tr()}${formControllers.search.text}"),)
-              else
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: _users!.length,
-                      itemBuilder: (context, index){
-                        return UsersResults(user: _users![index]);
-                      })
-              )
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        mainAxisSpacing: 2,
+                        crossAxisSpacing: 2),
+                      itemBuilder: (context, index) => PostsResults(model: _posts![index]),
+                    )
+                        : _users!.isEmpty ?
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28),
+                      child: Text("${"no_results_found".tr()}${formControllers.search.text}"),)
+                        : ListView.builder(
+                        itemCount: _users!.length,
+                        itemBuilder: (context, index){
+                          return UsersResults(user: _users![index]);
+                        })
+                )
             ],
           ),
         ),

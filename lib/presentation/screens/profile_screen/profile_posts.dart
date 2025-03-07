@@ -74,11 +74,14 @@ class _ProfilePostsState extends State<ProfilePosts> {
                     ? VideoPlayerWidget(videoUrl: _mediaUrls![index])
                     : Image.network(_mediaUrls![index], fit: BoxFit.cover),
               ),
-              _posts![index].mediaUrls.length > 1
-                  ? Positioned(top: 10, right: 10,
-                child: IconsWidget(icon: "multiple", color: Colors.white),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: _posts![index].mediaUrls.length > 1
+                    ? IconsWidget(icon: "multiple", color: Colors.white)
+                    : isVideo ? IconsWidget(icon: "reels_bold", color: Colors.white)
+                    : SizedBox(),
               )
-                  : SizedBox(),
             ],
           ),
         );

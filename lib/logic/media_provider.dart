@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/post_model.dart';
+import 'package:instagram_clone/data/reel_model.dart';
 import 'package:instagram_clone/data/story_model.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -124,6 +125,47 @@ class MediaProvider extends ChangeNotifier{
     }
     catch(e){
       showScaffoldMSG(context, "upload_failed");
+    }
+    notifyListeners();
+  }
+
+  Future deleteStory(context, StoryModel story) async {
+    try{
+      final user = Provider.of<UserProvider>(context, listen: false).currentUser!.uid;
+      await FirebaseFirestore.instance.collection('stories').doc(story.storyId).delete();
+      await FirebaseFirestore.instance.collection("users").doc(user).update({"stories":FieldValue.arrayRemove([story.storyId])});
+      await _supa.from("stories").remove(["${story.storyId}/${story.mediaUrl}"]);
+      showScaffoldMSG(context, "deleted_successfully");
+    }
+    catch(e){
+      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
+    }
+    notifyListeners();
+  }
+
+  Future uploadReel(context, ReelModel reel) async {
+    final user = Provider.of<UserProvider>(context, listen: false).currentUser;
+    try{
+      await FirebaseFirestore.instance.collection('reels').doc(reel.reelId).set(reel.toMap());
+      await FirebaseFirestore.instance.collection("users").doc(user!.uid).update({"reels":FieldValue.arrayUnion([reel.reelId])});
+      showScaffoldMSG(context, "uploaded_successfully");
+    }
+    catch(e){
+      showScaffoldMSG(context, "upload_failed");
+    }
+    notifyListeners();
+  }
+
+  Future deleteReel(context, ReelModel reel) async {
+    try{
+      final user = Provider.of<UserProvider>(context, listen: false).currentUser!.uid;
+      await FirebaseFirestore.instance.collection('reels').doc(reel.reelId).delete();
+      await FirebaseFirestore.instance.collection("users").doc(user).update({"reels":FieldValue.arrayRemove([reel.reelId])});
+      await _supa.from("reels").remove(["${reel.reelId}/${reel.videoUrl}"]);
+      showScaffoldMSG(context, "deleted_successfully");
+    }
+    catch(e){
+      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
     }
     notifyListeners();
   }

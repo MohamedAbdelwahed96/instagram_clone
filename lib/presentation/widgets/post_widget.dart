@@ -41,8 +41,8 @@ class _PostWidgetState extends State<PostWidget> {
     UserModel? userModel = await user.getUserInfo(widget.post.uid);
     String profilePicture = await media.getImage(bucketName: "images", folderName: "uploads", fileName: userModel!.pfpUrl);
     List<String> imgs = await media.getImages(bucketName: "posts", folderName: widget.post.postId);
-    bool like = await user.checkLike(userID: user.currentUser!.uid, postID: widget.post.postId);
-    bool save = await user.checkSave(userID: user.currentUser!.uid, postID: widget.post.postId);
+    bool like = await user.checkLike(mediaType: "posts", mediaID: widget.post.postId);
+    bool save = await user.checkSave(mediaType: "Posts", mediaID: widget.post.postId);
     setState(() {
       img = profilePicture;
       postMedia = imgs;
@@ -69,7 +69,6 @@ class _PostWidgetState extends State<PostWidget> {
                       InkWell(
                           onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profileID: widget.post.uid))),
                           child: CircleAvatar(backgroundImage: NetworkImage(img!))),
-                      SizedBox(width: 8),
                       TextButton(
                         child: Text(widget.post.username, style: TextStyle(fontWeight: FontWeight.w700,fontSize: 12),),
                         onPressed: ()=> Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profileID: widget.post.uid))),),
@@ -111,7 +110,7 @@ class _PostWidgetState extends State<PostWidget> {
                             String? mimeType = lookupMimeType("file$extension");
                             bool isVideo = mimeType!.startsWith("video/");
 
-                            return isVideo? VideoPlayerWidget(videoUrl: postMedia![index])
+                            return isVideo? VideoPlayerWidget(videoUrl: postMedia![index], tapToPlayPause: true)
                                 : Image.network(postMedia![index], fit: BoxFit.cover);
                           }),
                       widget.post.mediaUrls.length>1?
@@ -166,7 +165,7 @@ class _PostWidgetState extends State<PostWidget> {
                               widget.post.likes.remove(userID);
                             }
                           });
-                          userProvider.likePost(userID: userID, postID: widget.post.postId);
+                          userProvider.like(mediaType: "posts", mediaID: widget.post.postId);
                         }),
                       SizedBox(width: 12),
                       IconsWidget(icon: "comment"),

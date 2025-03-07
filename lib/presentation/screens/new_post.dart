@@ -121,8 +121,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             mediaUrls: provider.media,
                             caption: formControllers.caption.text,
                             createdAt: DateTime.now(),
-                            likes: [],
-                            commentCount: 0)
+                            likes: [])
                       );
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>NavigationBotBar()));
                     }, // upload post

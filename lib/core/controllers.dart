@@ -12,7 +12,7 @@ class FormControllers {
   final gender = TextEditingController();
   final search = TextEditingController();
   final message = TextEditingController();
-  final page = PageController(initialPage: 0);
+  final page = PageController();
   final caption = TextEditingController();
 
   void dispose() {

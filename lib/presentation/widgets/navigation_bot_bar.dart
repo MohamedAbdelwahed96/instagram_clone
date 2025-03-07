@@ -1,5 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
@@ -8,13 +8,11 @@ import 'package:instagram_clone/presentation/screens/search_screen/search_screen
 import 'package:provider/provider.dart';
 import '/presentation/widgets/floating_button_widget.dart';
 import '../screens/home_screen/home_screen.dart';
-import '/presentation/screens/new_post.dart';
 import '../screens/profile_screen/profile_screen.dart';
 
-import 'icons_widget.dart';
-
 class NavigationBotBar extends StatefulWidget {
-  const NavigationBotBar({super.key});
+  final int index;
+  const NavigationBotBar({super.key, this.index=0});
 
   @override
   State<NavigationBotBar> createState() => _NavigationBotBarState();
@@ -23,74 +21,83 @@ class NavigationBotBar extends StatefulWidget {
 class _NavigationBotBarState extends State<NavigationBotBar> {
   UserModel? user;
   String? img;
+  int _selectedPageIndex = 0;
+  late PageController _pageController;
+
+  @override
   void initState() {
     super.initState();
     fetchData();
+    _selectedPageIndex = widget.index;
+    _pageController = PageController(initialPage: _selectedPageIndex);
   }
 
   void fetchData() async {
     final userProvider =  Provider.of<UserProvider>(context, listen: false);
+    final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
     UserModel? fetchedUser = await userProvider.getUserInfo(userProvider.currentUser!.uid);
-    String? ProfilePicture = fetchedUser != null ?
-    await Provider.of<MediaProvider>(context, listen: false).getImage(bucketName: "images", folderName: "uploads", fileName: fetchedUser.pfpUrl)
+    String? pfp = fetchedUser != null ?
+    await mediaProvider.getImage(bucketName: "images", folderName: "uploads", fileName: fetchedUser.pfpUrl)
         : null;
     setState(() {
       user = fetchedUser;
-      img = ProfilePicture;
+      img = pfp;
     });
   }
 
   @override
   void dispose() {
-    formControllers.dispose();
     super.dispose();
   }
-
-  int _selectedPageIndex = 0;
-  final formControllers = FormControllers();
 
   @override
   Widget build(BuildContext context) {
     return Consumer<MediaProvider>(builder: (context, provider, _){
-      if (img == null || user == null) {
-        return Center(child: CircularProgressIndicator());
-      }
+      if (img == null || user == null) return Center(child: CircularProgressIndicator());
+      final theme = Theme.of(context).colorScheme;
+
       return Scaffold(
         floatingActionButton: FloatingButtonWidget(),
         body: PageView(
-            controller: formControllers.page,
+            controller: _pageController,
             onPageChanged: (index)=> setState(() => _selectedPageIndex=index),
             scrollDirection: Axis.horizontal,
             children: [
               HomeScreen(),
               SearchScreen(),
               ReelsScreen(),
-              ProfileScreen(profileID: "ZRtVkyk9d5YXEqhuVgCj3Esja8v2"),
+              Center(child: Text("coming_soon".tr())),
               ProfileScreen(profileID: user!.uid)
             ]),
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(splashFactory: NoSplash.splashFactory), // disable the splash effect
           child: Container(
             decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.1)))),
+                border: Border(top: BorderSide(color: theme.primary.withOpacity(0.1)))),
             child: BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
               showSelectedLabels: false,
               showUnselectedLabels: false,
               currentIndex: _selectedPageIndex,
-              onTap: (index) => formControllers.page.animateToPage(index, duration: Duration(milliseconds: 100), curve: Curves.ease),
-              items: [
-                BottomNavigationBarItem(icon: IconsWidget(icon: _selectedPageIndex==0?"home_bold":"home"), label: ""),
-                BottomNavigationBarItem(icon: IconsWidget(icon: _selectedPageIndex==1?"search_bold":"search"), label: ""),
-                BottomNavigationBarItem(icon: IconsWidget(icon: _selectedPageIndex==2?"reels_bold":"reels"), label: ""),
-                BottomNavigationBarItem(icon: IconsWidget(icon: _selectedPageIndex==3?"shop_bold":"shop"), label: ""),
-                BottomNavigationBarItem(icon: CircleAvatar(radius: 24, backgroundImage: NetworkImage(img!)), label: "")
-              ],
-              // selectedItemColor: Theme.of(context).colorScheme.primary, unselectedItemColor: Colors.grey, backgroundColor: Theme.of(context).colorScheme.surface, iconSize: 36,
+              onTap: (index) => _pageController.animateToPage(index, duration: Duration(milliseconds: 100), curve: Curves.ease),
+              items: List.generate(4, (index) => _items(index))
+                ..add(BottomNavigationBarItem(
+                  icon: CircleAvatar(radius: 18, backgroundImage: NetworkImage(img!)),
+                  label: "",
+                )),
             ),
           ),
         ) ,
       );
     });
+  }
+
+  BottomNavigationBarItem _items(int index) {
+    const icons = ["home", "search", "reels", "shop"];
+    String iconName = icons[index];
+    return BottomNavigationBarItem(
+      icon: ImageIcon(AssetImage(
+          "assets/icons/${_selectedPageIndex == index ? '${iconName}_bold' : iconName}.png"),
+          color: Theme.of(context).colorScheme.primary), label: "");
   }
 }

@@ -4,6 +4,9 @@ import 'package:instagram_clone/core/theme.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/login_screen.dart';
+import 'package:instagram_clone/presentation/screens/profile_screen/liked_posts.dart';
+import 'package:instagram_clone/presentation/screens/profile_screen/saved_posts.dart';
+import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -91,8 +94,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: Text("change_language".tr()),
                 ),
                 ListTile(
+                  onTap: ()=> Navigator.pushReplacement(context, MaterialPageRoute(
+                      builder: (context) => SavedPosts(user: widget.user))),
+                  leading: Icon(Icons.bookmark_border),
+                  title: Text("saved".tr()),
+                ),
+                ListTile(
+                  onTap: ()=> Navigator.pushReplacement(context, MaterialPageRoute(
+                      builder: (context) => LikedPosts(user: widget.user))),
+                  leading: IconsWidget(icon: "like"),
+                  title: Text("favorite".tr()),
+                ),
+                ListTile(
                   onTap: ()async{
-                    await Provider.of<UserProvider>(context, listen: false).signOut(context).then((v){
+                    await provider.signOut(context).then((v){
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
                     });
                   },

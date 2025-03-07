@@ -1,27 +1,25 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/data/post_model.dart';
+import 'package:instagram_clone/data/reel_model.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
-import 'package:instagram_clone/presentation/screens/profile_screen/posts_screen.dart';
+import 'package:instagram_clone/presentation/screens/reels_screen.dart';
 import 'package:instagram_clone/presentation/skeleton_loading/profile_posts_loading.dart';
-import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 import 'package:instagram_clone/presentation/widgets/video_player_widget.dart';
-import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
 
-class SavedPosts extends StatefulWidget {
+class ProfileReels extends StatefulWidget {
   final UserModel user;
-  const SavedPosts({super.key, required this.user});
+  const ProfileReels({super.key, required this.user});
 
   @override
-  State<SavedPosts> createState() => _SavedPostsState();
+  State<ProfileReels> createState() => _ProfileReelsState();
 }
 
-class _SavedPostsState extends State<SavedPosts> {
-  List<PostModel>? _posts;
-  List<String>? _mediaUrls;
+class _ProfileReelsState extends State<ProfileReels> {
+  List<ReelModel>? _reels;
+  List<String>? _videoUrl;
 
   @override
   void initState() {
@@ -33,52 +31,49 @@ class _SavedPostsState extends State<SavedPosts> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
 
-    List<PostModel> fetchedPosts = await userProvider.getSavedPosts(widget.user.uid);
-    List<String> fetchedMediaUrls = await Future.wait(
-      fetchedPosts.map((post) async => await mediaProvider.getImage(
-          bucketName: "posts", folderName: post.postId, fileName: post.mediaUrls[0]),
+    List<ReelModel> fetchedReels = await userProvider.getUserReels(widget.user.uid);
+    List<String> fetchedReelsURLs = await Future.wait(
+      fetchedReels.map((reel) async => await mediaProvider.getImage(
+          bucketName: "reels", folderName: reel.reelId, fileName: reel.videoUrl),
       ),
     );
 
     setState(() {
-      _posts = fetchedPosts;
-      _mediaUrls = fetchedMediaUrls;
+      _reels = fetchedReels;
+      _videoUrl = fetchedReelsURLs;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_posts == null || _mediaUrls == null) return SkeletonProfilePost();
+    if (_reels == null || _videoUrl == null) return SkeletonProfilePost();
 
-    return _posts!.isNotEmpty
+    return _reels!.isNotEmpty
         ? GridView.builder(
       physics: BouncingScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           crossAxisSpacing: 1,
           mainAxisSpacing: 1),
-      itemCount: _posts!.length,
+      itemCount: _reels!.length,
       itemBuilder: (context, index) {
-        String extension = _mediaUrls![index].substring(_mediaUrls![index].lastIndexOf("."));
-        String mimeType = lookupMimeType("file$extension")!;
-        bool isVideo = mimeType.startsWith("video/");
-
         return InkWell(
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>
-              PostsScreen(user: widget.user, posts: _posts!,initialIndex: index
-              ))),
+              ReelsScreen(userID: widget.user.uid))),
           child: Stack(
             children: [
               SizedBox.expand(
-                child: isVideo
-                    ? VideoPlayerWidget(videoUrl: _mediaUrls![index])
-                    : Image.network(_mediaUrls![index], fit: BoxFit.cover),
+                child: VideoPlayerWidget(videoUrl: _videoUrl![index])
               ),
-              _posts![index].mediaUrls.length > 1
-                  ? Positioned(top: 10, right: 10,
-                child: IconsWidget(icon: "multiple", color: Colors.white),
+              Positioned(bottom: 10, left: 10,
+                child: Row(
+                  children: [
+                    Icon(Icons.remove_red_eye_outlined, color: Colors.white),
+                    SizedBox(width: 5),
+                    Text(_reels![index].views.length.toString(), style: TextStyle(color: Colors.white),)
+                  ],
+                ),
               )
-                  : SizedBox(),
             ],
           ),
         );
@@ -101,7 +96,7 @@ class _SavedPostsState extends State<SavedPosts> {
         ),
         SizedBox(height: 10),
         Text(
-        "no_saved_posts".tr(),
+          "no_posts_yet".tr(),
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ],

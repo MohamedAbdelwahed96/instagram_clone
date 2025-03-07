@@ -7,7 +7,7 @@ class PostModel {
   final String caption;
   final DateTime createdAt;
   final List<String> likes;
-  final int commentCount;
+  final List<String> comments;
 
   PostModel({
     required this.postId,
@@ -17,8 +17,8 @@ class PostModel {
     required this.mediaUrls,
     required this.caption,
     required this.createdAt,
-    required this.likes,
-    required this.commentCount,
+    this.likes = const [],
+    this.comments = const [],
   });
 
   factory PostModel.fromMap(Map<String, dynamic> map) {
@@ -31,7 +31,7 @@ class PostModel {
       caption: map['caption'],
       createdAt: DateTime.parse(map['createdAt']),
       likes: List<String>.from(map['likes']),
-      commentCount: map['commentCount'],
+      comments: List<String>.from(map['comments']),
     );
   }
 
@@ -45,7 +45,7 @@ class PostModel {
       'caption': caption,
       'createdAt': createdAt.toIso8601String(),
       'likes': likes,
-      'commentCount': commentCount,
+      'comments': comments,
     };
   }
 }
