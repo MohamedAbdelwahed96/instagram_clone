@@ -15,6 +15,7 @@ class UserModel {
   final String website;
   final DateTime time;
   final String language;
+  final String fcmToken;
 
   UserModel({
     this.uid = "",
@@ -33,6 +34,7 @@ class UserModel {
     this.website = "",
     required this.time,
     this.language = "en",
+    this.fcmToken = "",
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -53,6 +55,7 @@ class UserModel {
       website: map['website'] ?? '',
       time: map['time'] != null ? DateTime.parse(map['time']) : DateTime.now(),
       language: map['language'] ?? 'en',
+      fcmToken: map['fcmToken'] ?? '',
     );
   }
 
@@ -74,6 +77,7 @@ class UserModel {
       'website': website,
       'time': time.toIso8601String(),
       'language': language,
+      'fcmToken': fcmToken,
     };
   }
 }

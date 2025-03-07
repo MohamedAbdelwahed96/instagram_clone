@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/reel_model.dart';
 import 'package:instagram_clone/data/story_model.dart';
@@ -11,16 +12,21 @@ import 'package:instagram_clone/presentation/widgets/scaffold_msg.dart';
 class UserProvider extends ChangeNotifier {
   final _auth = FirebaseAuth.instance;
   final _store = FirebaseFirestore.instance;
+  final _msg = FirebaseMessaging.instance;
   User? get currentUser => _auth.currentUser;
 
   bool _isLogged=false;
   bool get isLogged => _isLogged;
 
-  Future<void> signUp(context, UserModel user, String password) async {
+  Future signUp(context, UserModel user, String password) async {
     try{
       UserCredential userCd = await _auth.createUserWithEmailAndPassword(email: user.email, password: password);
+      String? token = await _msg.getToken();
       await _store.collection("users").doc(userCd.user!.uid).set(user.toMap());
-      await _store.collection("users").doc(userCd.user!.uid).update({"uid":userCd.user!.uid});
+      await _store.collection("users").doc(userCd.user!.uid).update({
+        "uid":userCd.user!.uid,
+        "fcmToken":token
+      });
       showScaffoldMSG(context, "created_successfully");
       _isLogged=true;
     }
@@ -31,19 +37,11 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future changePassword(context, String newPassword) async {
-    await currentUser!.updatePassword(newPassword);
-    showScaffoldMSG(context, "password_updated".tr());
-  }
-
-  Future resetPassword(context, String email) async {
-    await _auth.sendPasswordResetEmail(email: email);
-    showScaffoldMSG(context, "password_reset".tr());
-  }
-
-  Future<void> signIn(context, String email, password) async {
+  Future signIn(context, String email, password) async {
     try{
+      String? token = await _msg.getToken();
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      await _store.collection("users").doc(currentUser!.uid).update({"fcmToken":token});
       showScaffoldMSG(context, "logged_in_successfully");
       _isLogged = true;
     }
@@ -54,13 +52,10 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> signOut(context) async{
+  Future signOut(context) async{
     await _auth.signOut();
     showScaffoldMSG(context, "signed_out_successfully");
   }
-
-  UserModel? _userData;
-  UserModel? get userData => _userData;
 
   Future<UserModel?> getUserInfo(String userID) async {
     try {
@@ -71,7 +66,7 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> saveInfo(context, String name, username, web, bio, email, phone, gender, pfpUrl) async {
+  Future saveInfo(context, String name, username, web, bio, email, phone, gender, pfpUrl) async {
     try {
       if(email!=currentUser!.email) {
         await currentUser!.verifyBeforeUpdateEmail(email);
@@ -93,62 +88,6 @@ class UserProvider extends ChangeNotifier {
         showScaffoldMSG(context, "updated_successfully");
       }
     } catch (e) {
-      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
-    }
-  }
-
-  Future<bool> checkLike({required String mediaType, required String mediaID}) async{
-    final response = await _store.collection(mediaType).doc(mediaID).get();
-    if ((response.data() as dynamic)["likes"].contains(currentUser!.uid)) return true;
-    return false;
-  }
-
-  Future like({required String mediaType, required String mediaID, context}) async{
-    try{
-      final response = await _store.collection(mediaType).doc(mediaID).get();
-
-      if((response.data() as dynamic)["likes"].contains(currentUser!.uid)){
-        await _store.collection(mediaType).doc(mediaID).update({"likes":FieldValue.arrayRemove([currentUser!.uid])});
-        await _store.collection("users").doc(currentUser!.uid).update({"likes":FieldValue.arrayRemove([mediaID])});
-      } else {
-        await _store.collection(mediaType).doc(mediaID).update({"likes":FieldValue.arrayUnion([currentUser!.uid])});
-        await _store.collection("users").doc(currentUser!.uid).update({"likes":FieldValue.arrayUnion([mediaID])});
-      } notifyListeners();
-    }
-    catch(e){
-      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
-    }
-  }
-
-  Future viewReel({required String reelID}) async{
-    final response = await _store.collection("reels").doc(reelID).get();
-    if(!(response.data() as dynamic)["views"].contains(currentUser!.uid)) {
-      await _store.collection("reels").doc(reelID)
-          .update({"views": FieldValue.arrayUnion([currentUser!.uid])});
-    }
-    notifyListeners();
-  }
-
-  Future<bool> checkFollow(String yourID, followerID) async{
-    final response = await _store.collection("users").doc(yourID).get();
-    if ((response.data() as dynamic)["following"].contains(followerID)) return true;
-    return false;
-  }
-
-  Future followProfile(String yourID, followerID, context) async{
-    try{
-      final response = await _store.collection("users").doc(yourID).get();
-
-      if((response.data() as dynamic)["following"].contains(followerID)){
-        await _store.collection("users").doc(followerID).update({"followers":FieldValue.arrayRemove([yourID])});
-        await _store.collection("users").doc(yourID).update({"following":FieldValue.arrayRemove([followerID])});
-      }
-      else {
-        await _store.collection("users").doc(followerID).update({"followers":FieldValue.arrayUnion([yourID])});
-        await _store.collection("users").doc(yourID).update({"following":FieldValue.arrayUnion([followerID])});}
-      notifyListeners();
-    }
-    catch(e){
       showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
     }
   }
@@ -227,12 +166,6 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<UserModel>> searchUsers(context, String username) async {
-    final response = await _store.collection("users").where("username", isGreaterThanOrEqualTo: username).get();
-    notifyListeners();
-    return response.docs.map((e)=>UserModel.fromMap(e.data())).toList();
-  }
-
   Future<List<StoryModel>> getRecentStories(String userId) async {
     try {
       final response = await _store.collection("stories").where("userId", isEqualTo: userId).get();
@@ -244,13 +177,75 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  Future<List<UserModel>> searchUsers(context, String username) async {
+    final response = await _store.collection("users").where("username", isGreaterThanOrEqualTo: username).get();
+    notifyListeners();
+    return response.docs.map((e)=>UserModel.fromMap(e.data())).toList();
+  }
+
+  Future<bool> checkLike({required String mediaType, required String mediaID}) async{
+    final response = await _store.collection(mediaType).doc(mediaID).get();
+    if ((response.data() as dynamic)["likes"].contains(currentUser!.uid)) return true;
+    return false;
+  }
+
+  Future like({required String mediaType, required String mediaID, context}) async{
+    try{
+      final response = await _store.collection(mediaType).doc(mediaID).get();
+
+      if((response.data() as dynamic)["likes"].contains(currentUser!.uid)){
+        await _store.collection(mediaType).doc(mediaID).update({"likes":FieldValue.arrayRemove([currentUser!.uid])});
+        await _store.collection("users").doc(currentUser!.uid).update({"likes":FieldValue.arrayRemove([mediaID])});
+      } else {
+        await _store.collection(mediaType).doc(mediaID).update({"likes":FieldValue.arrayUnion([currentUser!.uid])});
+        await _store.collection("users").doc(currentUser!.uid).update({"likes":FieldValue.arrayUnion([mediaID])});
+      } notifyListeners();
+    }
+    catch(e){
+      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
+    }
+  }
+
+  Future viewReel({required String reelID}) async{
+    final response = await _store.collection("reels").doc(reelID).get();
+    if(!(response.data() as dynamic)["views"].contains(currentUser!.uid)) {
+      await _store.collection("reels").doc(reelID)
+          .update({"views": FieldValue.arrayUnion([currentUser!.uid])});
+    }
+    notifyListeners();
+  }
+
+  Future<bool> checkFollow(String yourID, followerID) async{
+    final response = await _store.collection("users").doc(yourID).get();
+    if ((response.data() as dynamic)["following"].contains(followerID)) return true;
+    return false;
+  }
+
+  Future followProfile(String yourID, followerID, context) async{
+    try{
+      final response = await _store.collection("users").doc(yourID).get();
+
+      if((response.data() as dynamic)["following"].contains(followerID)){
+        await _store.collection("users").doc(followerID).update({"followers":FieldValue.arrayRemove([yourID])});
+        await _store.collection("users").doc(yourID).update({"following":FieldValue.arrayRemove([followerID])});
+      }
+      else {
+        await _store.collection("users").doc(followerID).update({"followers":FieldValue.arrayUnion([yourID])});
+        await _store.collection("users").doc(yourID).update({"following":FieldValue.arrayUnion([followerID])});}
+      notifyListeners();
+    }
+    catch(e){
+      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
+    }
+  }
+
   Future<bool> checkSave({required String mediaType, required String mediaID}) async{
    final response = await _store.collection("users").doc(currentUser!.uid).get();
    if ((response.data() as dynamic)["savedPosts"].contains(mediaID)) return true;
    return false;
   }
 
- Future savePost(context, {required String userID, required String postID}) async{
+  Future savePost(context, {required String userID, required String postID}) async{
    try{
      final response = await _store.collection("users").doc(userID).get();
 
@@ -275,123 +270,115 @@ class UserProvider extends ChangeNotifier {
   String chatId(String userId) => currentUser!.uid.compareTo(userId) < 0 ?
   "${currentUser!.uid}\_$userId" : "$userId\_${currentUser!.uid}";
 
-
-
-
-
-
-
-  Future<void> deleteUser(BuildContext context) async {
-      User? user = _auth.currentUser!;
-
-      await _store.collection("users").doc(user.uid).delete();
-      final posts = await _store.collection("posts").where("uid", isEqualTo: user.uid).get();
-      for (var doc in posts.docs) {
-        await _store.collection("posts").doc(doc.id).delete();
-      }
-
-      final reels = await _store.collection("reels").where("userId", isEqualTo: user.uid).get();
-      for (var doc in reels.docs) {
-        await _store.collection("reels").doc(doc.id).delete();
-      }
-
-      final stories = await _store.collection("stories").where("userId", isEqualTo: user.uid).get();
-      for (var doc in stories.docs) {
-        await _store.collection("stories").doc(doc.id).delete();
-      }
-
-      final followers = await _store.collection("users").where("followers", arrayContains: user.uid).get();
-      for (var doc in followers.docs) {
-        await _store.collection("users").doc(doc.id).update({
-          "followers": FieldValue.arrayRemove([user.uid])
-        });
-      }
-
-      final followings = await _store.collection("users").where("following", arrayContains: user.uid).get();
-      for (var doc in followings.docs) {
-        await _store.collection("users").doc(doc.id).update({
-          "following": FieldValue.arrayRemove([user.uid])
-        });
-      }
-
-      final likedPosts = await _store.collection("posts").where("likes", arrayContains: user.uid).get();
-      for (var doc in likedPosts.docs) {
-        await _store.collection("posts").doc(doc.id).update({
-          "likes": FieldValue.arrayRemove([user.uid])
-        });
-      }
-
-      final likedReels = await _store.collection("reels").where("likes", arrayContains: user.uid).get();
-      for (var doc in likedReels.docs) {
-        await _store.collection("reels").doc(doc.id).update({
-          "likes": FieldValue.arrayRemove([user.uid])
-        });
-      }
-
-      final viewedReels = await _store.collection("reels").where("views", arrayContains: user.uid).get();
-      for (var doc in viewedReels.docs) {
-        await _store.collection("reels").doc(doc.id).update({
-          "views": FieldValue.arrayRemove([user.uid])
-        });
-      }
-
-      await user.delete();
-      showScaffoldMSG(context, "account_deleted_successfully");
-      _isLogged = false;
-    notifyListeners();
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-  Future<void> deleteUser2(BuildContext context) async {
-    User? user = _auth.currentUser!;
-    WriteBatch batch = _store.batch();
-    batch.delete(_store.collection("users").doc(user.uid));
-
-    List<Map<String, dynamic>> collections = [
-      {"collection": "posts", "field": "uid"},
-      {"collection": "reels", "field": "userId"},
-      {"collection": "stories", "field": "userId"},
-    ];
-
-    List<Map<String, dynamic>> userFields = [
-      {"field": "followers", "collection": "users"},
-      {"field": "following", "collection": "users"},
-      {"field": "likes", "collection": "posts"},
-      {"field": "likes", "collection": "reels"},
-      {"field": "views", "collection": "reels"},
-    ];
-
-    for (var item in collections) {
-      var snapshot = await _store.collection(item["collection"]!).where(item["field"]!, isEqualTo: user.uid).get();
-      for (var doc in snapshot.docs) {
-        batch.delete(doc.reference);
-      }
-    }
-
-    for (var item in userFields) {
-      var snapshot = await _store.collection(item["collection"]!).where(item["field"]!, arrayContains: user.uid).get();
-      for (var doc in snapshot.docs) {
-        batch.update(doc.reference, {item["field"]!: FieldValue.arrayRemove([user.uid])});
-      }
-    }
-
-    await batch.commit();
-    await user.delete();
-
-    showScaffoldMSG(context, "account_deleted_successfully");
-    _isLogged = false;
-
-  notifyListeners();
-  }
+  // Future changePassword(context, String newPassword) async {
+  //   await currentUser!.updatePassword(newPassword);
+  //   showScaffoldMSG(context, "password_updated".tr());
+  // }
+  //
+  // Future resetPassword(context, String email) async {
+  //   await _auth.sendPasswordResetEmail(email: email);
+  //   showScaffoldMSG(context, "password_reset".tr());
+  // }
+  //
+  // Future deleteUser(BuildContext context) async {
+  //     User? user = _auth.currentUser!;
+  //
+  //     await _store.collection("users").doc(user.uid).delete();
+  //     final posts = await _store.collection("posts").where("uid", isEqualTo: user.uid).get();
+  //     for (var doc in posts.docs) {
+  //       await _store.collection("posts").doc(doc.id).delete();
+  //     }
+  //
+  //     final reels = await _store.collection("reels").where("userId", isEqualTo: user.uid).get();
+  //     for (var doc in reels.docs) {
+  //       await _store.collection("reels").doc(doc.id).delete();
+  //     }
+  //
+  //     final stories = await _store.collection("stories").where("userId", isEqualTo: user.uid).get();
+  //     for (var doc in stories.docs) {
+  //       await _store.collection("stories").doc(doc.id).delete();
+  //     }
+  //
+  //     final followers = await _store.collection("users").where("followers", arrayContains: user.uid).get();
+  //     for (var doc in followers.docs) {
+  //       await _store.collection("users").doc(doc.id).update({
+  //         "followers": FieldValue.arrayRemove([user.uid])
+  //       });
+  //     }
+  //
+  //     final followings = await _store.collection("users").where("following", arrayContains: user.uid).get();
+  //     for (var doc in followings.docs) {
+  //       await _store.collection("users").doc(doc.id).update({
+  //         "following": FieldValue.arrayRemove([user.uid])
+  //       });
+  //     }
+  //
+  //     final likedPosts = await _store.collection("posts").where("likes", arrayContains: user.uid).get();
+  //     for (var doc in likedPosts.docs) {
+  //       await _store.collection("posts").doc(doc.id).update({
+  //         "likes": FieldValue.arrayRemove([user.uid])
+  //       });
+  //     }
+  //
+  //     final likedReels = await _store.collection("reels").where("likes", arrayContains: user.uid).get();
+  //     for (var doc in likedReels.docs) {
+  //       await _store.collection("reels").doc(doc.id).update({
+  //         "likes": FieldValue.arrayRemove([user.uid])
+  //       });
+  //     }
+  //
+  //     final viewedReels = await _store.collection("reels").where("views", arrayContains: user.uid).get();
+  //     for (var doc in viewedReels.docs) {
+  //       await _store.collection("reels").doc(doc.id).update({
+  //         "views": FieldValue.arrayRemove([user.uid])
+  //       });
+  //     }
+  //
+  //     await user.delete();
+  //     showScaffoldMSG(context, "account_deleted_successfully");
+  //     _isLogged = false;
+  //   notifyListeners();
+  // }
+  //
+  // Future deleteUser2(BuildContext context) async {
+  //   User? user = _auth.currentUser!;
+  //   WriteBatch batch = _store.batch();
+  //   batch.delete(_store.collection("users").doc(user.uid));
+  //
+  //   List<Map<String, dynamic>> collections = [
+  //     {"collection": "posts", "field": "uid"},
+  //     {"collection": "reels", "field": "userId"},
+  //     {"collection": "stories", "field": "userId"},
+  //   ];
+  //
+  //   List<Map<String, dynamic>> userFields = [
+  //     {"field": "followers", "collection": "users"},
+  //     {"field": "following", "collection": "users"},
+  //     {"field": "likes", "collection": "posts"},
+  //     {"field": "likes", "collection": "reels"},
+  //     {"field": "views", "collection": "reels"},
+  //   ];
+  //
+  //   for (var item in collections) {
+  //     var snapshot = await _store.collection(item["collection"]!).where(item["field"]!, isEqualTo: user.uid).get();
+  //     for (var doc in snapshot.docs) {
+  //       batch.delete(doc.reference);
+  //     }
+  //   }
+  //
+  //   for (var item in userFields) {
+  //     var snapshot = await _store.collection(item["collection"]!).where(item["field"]!, arrayContains: user.uid).get();
+  //     for (var doc in snapshot.docs) {
+  //       batch.update(doc.reference, {item["field"]!: FieldValue.arrayRemove([user.uid])});
+  //     }
+  //   }
+  //
+  //   await batch.commit();
+  //   await user.delete();
+  //
+  //   showScaffoldMSG(context, "account_deleted_successfully");
+  //   _isLogged = false;
+  //
+  // notifyListeners();
+  // }
 }

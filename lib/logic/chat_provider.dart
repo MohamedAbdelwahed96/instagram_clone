@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/chat_model.dart';
+import 'package:instagram_clone/services/notification.dart';
 
 class ChatProvider extends ChangeNotifier {
   final _dbRef = FirebaseDatabase.instance.ref();
+  final FirebaseFirestore _store = FirebaseFirestore.instance;
   final Map<String, List<ChatModel>> chats = {};
 
   Future getMessages(String chatId) async {
@@ -50,6 +53,21 @@ class ChatProvider extends ChangeNotifier {
     final msg = _dbRef.child("chats/${message.chatId}/messages").push();
     await msg.set(message.toMap());
     await msg.update({"messageId": msg.key});
+
+
+    // Fetch recipient's FCM token from Firestore
+    DocumentSnapshot userDoc =
+    await _store.collection("users").doc(message.receiverId).get();
+    String? fcmToken = userDoc.exists ? userDoc["fcmToken"] : null;
+
+    if (fcmToken != null) {
+      // Send push notification using NotificationService
+      NotificationService.instance.sendPushNotification(
+        fcmToken: fcmToken,
+        senderId: message.senderId,
+        message: message.message,
+      );
+    }
   }
 
   Future deleteMessage(String chatId, String msgId) async {
