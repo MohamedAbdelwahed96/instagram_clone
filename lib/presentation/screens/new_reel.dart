@@ -49,7 +49,10 @@ class _NewReelState extends State<NewReel> {
         appBar: AppBar(
           title: Text("new_reel".tr()),
           centerTitle: true,
-          leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: ()=> Navigator.pop(context)),
+          leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () {
+            provider.mediaFile = null;
+            Navigator.pop(context);
+          }),
           actions: [
             provider.uploadProgress > 0 && provider.uploadProgress < 1.0
                 ? Padding(
@@ -85,7 +88,24 @@ class _NewReelState extends State<NewReel> {
                       ? Center(child: IconButton(
                       onPressed: () async => await provider.selectMedia(FileType.video),
                       icon: Icon(Icons.add_a_photo, size: 50, color: theme.secondary)),)
-                      : VideoPlayerWidget(videoFile: File(provider.mediaFile!.path!), tapToPlayPause: true)
+                      : Stack(
+                    children: [
+                      Center(
+                          child: VideoPlayerWidget(videoFile: File(provider.mediaFile!.path!)),
+                      ),
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: IconButton(
+                          icon: Icon(Icons.close, size: 30),
+                          onPressed: () {
+                            provider.mediaFile=null;
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
               ),
             ),
             Padding(

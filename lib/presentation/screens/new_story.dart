@@ -52,7 +52,10 @@ class _NewStoryState extends State<NewStory> {
         appBar: AppBar(
           title: Text("add_to_story".tr()),
           centerTitle: true,
-          leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: ()=> Navigator.pop(context)),
+          leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () {
+            provider.mediaFile = null;
+            Navigator.pop(context);
+          }),
           actions: [
             provider.uploadProgress > 0 && provider.uploadProgress < 1.0
                 ? Padding(
@@ -91,10 +94,24 @@ class _NewStoryState extends State<NewStory> {
                       setState(() => _isVideo = lookupMimeType(provider.mediaFile!.path!)!.startsWith("video/"));
                     },
                     icon: Icon(Icons.add_a_photo, size: 50, color: theme.secondary)),) :
-                _isVideo ?
-                VideoPlayerWidget(videoFile: File(provider.mediaFile!.path!)):
-                // lookupMimeType(provider.mediaFile!.path!)!.startsWith("image/")?
-                Image.file(File(provider.mediaFile!.path!), fit: BoxFit.fitHeight)
+                Stack(
+                  children: [
+                    Center(child: _isVideo ?
+                    VideoPlayerWidget(videoFile: File(provider.mediaFile!.path!)) :
+                    Image.file(File(provider.mediaFile!.path!), fit: BoxFit.fitHeight)),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: IconButton(
+                        icon: Icon(Icons.close, size: 30),
+                        onPressed: () {
+                          provider.mediaFile=null;
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

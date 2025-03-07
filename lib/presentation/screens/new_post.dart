@@ -49,7 +49,10 @@ class _NewPostScreenState extends State<NewPostScreen> {
             appBar: AppBar(
               title: Text("new_post".tr()),
               centerTitle: true,
-              leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: ()=> Navigator.pop(context)),
+              leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () {
+                provider.mediaFiles = [];
+                Navigator.pop(context);
+              }),
               actions: [
                 provider.uploadProgress > 0 && provider.uploadProgress < 1.0
                     ? Padding(
@@ -95,12 +98,25 @@ class _NewPostScreenState extends State<NewPostScreen> {
                           final file = provider.mediaFiles[index];
                           final path = file.path!;
 
-                          if(lookupMimeType(path)!.startsWith("video/")) {
-                            return VideoPlayerWidget(videoFile: File(path));
-                          } else if(lookupMimeType(path)!.startsWith("image/")) {
-                              return Image.file(File(file.path!), fit: BoxFit.fitHeight,);
-                            }
-                          return null;
+                          return Stack(
+                            children: [
+                              if(lookupMimeType(path)!.startsWith("video/"))
+                                Center(child: VideoPlayerWidget(videoFile: File(path), tapToPlayPause: true))
+                              else if(lookupMimeType(path)!.startsWith("image/"))
+                                Center(child: Image.file(File(file.path!), fit: BoxFit.fitHeight,)),
+                              Positioned(
+                                top: 10,
+                                right: 10,
+                                child: IconButton(
+                                  icon: Icon(Icons.close, size: 30),
+                                  onPressed: () {
+                                    provider.mediaFiles.removeAt(index);
+                                    setState(() {});
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
                         }),
                   ),
                 ),
