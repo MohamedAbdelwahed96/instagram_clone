@@ -46,12 +46,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    if (userImg == null) return CircularProgressIndicator();
 
     return Consumer<ChatProvider>(builder: (context, provider, _){
-      if(userImg==null){
-        return CircularProgressIndicator();
-      }
+      final theme = Theme.of(context).colorScheme;
+      final screen = MediaQuery.of(context).size;
       final messages = provider.chats[widget.chatId] ?? [];
 
       return Scaffold(
@@ -64,7 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     IconButton(onPressed: ()=> Navigator.pop(context), icon: Icon(Icons.arrow_back)),
                     CircleAvatar(foregroundImage: NetworkImage(userImg!)),
-                    SizedBox(width: 10),
+                    SizedBox(width: screen.width*0.025),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -89,8 +88,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     final bool isLastFromUser = index == 0 ||
                         messages[index].senderId != messages[index - 1].senderId;
 
-
-
                     return Row(
                       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
                       children: [
@@ -100,14 +97,14 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           ),
                             child: CircleAvatar(foregroundImage: NetworkImage(userImg!))),
-                        if (!isMe && !isLastFromUser) SizedBox(width: MediaQuery.of(context).size.width*0.1),
+                        if (!isMe && !isLastFromUser) SizedBox(width: screen.width*0.1),
                           InkWell(
                           onLongPress: () {
                             if (isMe) {
                               showDialog(context: context, builder: (context){
                                 return Dialog(
                                   child: Container(
-                                    height: MediaQuery.of(context).size.height*0.1,
+                                    height: screen.height*0.1,
                                     color: theme.inversePrimary,
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -135,7 +132,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           },
                           child: Container(
                             constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width * 0.7),
+                                maxWidth: screen.width * 0.7),
                             margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
                             padding: EdgeInsets.all(10.0),
                             decoration: BoxDecoration(
@@ -158,7 +155,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8),
                 child: Row(
                   children: [
                     Expanded(

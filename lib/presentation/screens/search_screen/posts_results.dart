@@ -22,7 +22,7 @@ class _PostsResultsState extends State<PostsResults> {
     super.initState();
     Provider.of<MediaProvider>(context, listen: false).getImage(
         bucketName: "posts", folderName: widget.model!.postId, fileName: widget.model!.mediaUrls[0])
-    .then((v)=> setState(() => userMedia = v));
+    .then((media)=> setState(() => userMedia = media));
   }
 
   @override
