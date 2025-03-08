@@ -66,11 +66,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       formControllers.email.text = user!.email;
       formControllers.phone.text = user!.pNumber;
       formControllers.gender.text = user!.gender;
+
       return PopScope(
-        canPop: true,
-        onPopInvokedWithResult: (didPop, result) {
-          if (!didPop) return;
+        canPop: false,
+        onPopInvokedWithResult: (popped, _) {
           mediaProvider.mediaFile = null;
+          Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) => NavigationBotBar(index: 4)));
         },
         child: Scaffold(
           appBar: AppBar(
