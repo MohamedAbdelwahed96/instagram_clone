@@ -29,22 +29,22 @@ class _StoryWidgetState extends State<StoryWidget> {
     List<List<StoryModel>> storiesList = await Future.wait(
       widget.users.map((user) => userProvider.getRecentStories(user.uid)),
     );
-
     setState(() => fetchedStories = storiesList);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (fetchedStories==null) return SizedBox.shrink();
+    if (fetchedStories == null) return SizedBox.shrink();
+    final screen = MediaQuery.of(context).size;
     return SizedBox(
-      height: MediaQuery.of(context).size.width * 0.22,
+      height: screen.width * 0.22,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: widget.users.length,
         itemBuilder: (context, index) {
           if (index != 0 && fetchedStories![index].isEmpty) return SizedBox();
           return Padding(
-            padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.01),
+            padding: EdgeInsets.symmetric(horizontal: screen.width * 0.01),
             child: InkWell(
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>
               fetchedStories![index].isNotEmpty ? StoryScreen(user: widget.users[index])
@@ -65,26 +65,26 @@ class _StoryWidgetState extends State<StoryWidget> {
                         color: Theme.of(context).colorScheme.surface),
                       padding: EdgeInsets.all(3),
                       child: CircleAvatar(
-                        radius: MediaQuery.of(context).size.width * 0.08,
+                        radius: screen.width * 0.08,
                         backgroundImage: NetworkImage(widget.pfpUrls[index]),
                       ),
                     ),
                   ),
                   if (index == 0)
                     Positioned(
-                      bottom: MediaQuery.of(context).size.width * 0.02,
-                      right: MediaQuery.of(context).size.width * 0.001,
+                      bottom: screen.width * 0.02,
+                      right: screen.width * 0.001,
                       child: InkWell(
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewStory())),
                         child: CircleAvatar(
-                          radius: MediaQuery.of(context).size.width * 0.036,
+                          radius: screen.width * 0.036,
                           backgroundColor: Theme.of(context).colorScheme.surface,
                           child: CircleAvatar(
-                            radius: MediaQuery.of(context).size.width * 0.03,
+                            radius: screen.width * 0.03,
                             backgroundColor: Colors.blue,
                             child: Icon(Icons.add,
                               color: Colors.white,
-                              size: MediaQuery.of(context).size.width * 0.05,
+                              size: screen.width * 0.05,
                             ),
                           ),
                         ),

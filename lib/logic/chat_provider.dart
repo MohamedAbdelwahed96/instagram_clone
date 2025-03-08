@@ -53,15 +53,15 @@ class ChatProvider extends ChangeNotifier {
     await msg.set(message.toMap());
     await msg.update({"messageId": msg.key});
 
-    final userDoc = await _store.collection("users").doc(message.receiverId).get();
-    String? fcmToken = userDoc.exists ? userDoc["fcmToken"] : null;
-
-    if (fcmToken != null) {
-      NotificationService.instance.sendPushNotification(
-          fcmToken: fcmToken,
-          senderId: message.senderId,
-          message: message.message);
-    }
+    // final userDoc = await _store.collection("users").doc(message.receiverId).get();
+    // String? fcmToken = userDoc.exists ? userDoc["fcmToken"] : null;
+    //
+    // if (fcmToken != null) {
+    //   NotificationService.instance.sendPushNotification(
+    //       fcmToken: fcmToken,
+    //       senderId: message.senderId,
+    //       message: message.message);
+    // }
   }
 
   Future deleteMessage(String chatId, String msgId) async {

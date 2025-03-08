@@ -4,27 +4,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 ThemeData lightMode = ThemeData(
     brightness: Brightness.light,
     colorScheme: ColorScheme.light(
-      // Background
-      surface: Colors.white,
-      // Text
-      primary: Colors.black,
-      // HintText
-      secondary: Color.fromRGBO(32, 32, 32, 1),
-      // TextFormField Background
-      inversePrimary: Color.fromRGBO(217, 217, 217, 1),
+      surface: Colors.white, /// Background
+      primary: Colors.black, /// Text
+      secondary: Color.fromRGBO(32, 32, 32, 1), /// HintText
+      inversePrimary: Color.fromRGBO(217, 217, 217, 1), /// TextFormField Background
     ));
 
 ThemeData darkMode = ThemeData(
     brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
-      // Background
-      surface: Colors.black,
-      // Text
-      primary: Colors.white,
-      //HintText
-      secondary: Color.fromRGBO(223, 223, 223, 1),
-      // TextFormField Background
-      inversePrimary: Color.fromRGBO(38, 38, 38, 1),
+      surface: Colors.black, /// Background
+      primary: Colors.white, /// Text
+      secondary: Color.fromRGBO(223, 223, 223, 1), /// HintText
+      inversePrimary: Color.fromRGBO(38, 38, 38, 1), /// TextFormField Background
     ));
 
 class ThemeProvider with ChangeNotifier {

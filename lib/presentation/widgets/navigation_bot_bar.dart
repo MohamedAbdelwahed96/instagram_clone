@@ -6,7 +6,6 @@ import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/reels_screen.dart';
 import 'package:instagram_clone/presentation/screens/search_screen/search_screen.dart';
 import 'package:provider/provider.dart';
-import '/presentation/widgets/floating_button_widget.dart';
 import '../screens/home_screen/home_screen.dart';
 import '../screens/profile_screen/profile_screen.dart';
 
@@ -57,7 +56,6 @@ class _NavigationBotBarState extends State<NavigationBotBar> {
       final theme = Theme.of(context).colorScheme;
 
       return Scaffold(
-        floatingActionButton: FloatingButtonWidget(),
         body: PageView(
             controller: _pageController,
             onPageChanged: (index)=> setState(() => _selectedPageIndex=index),
