@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     List<PostModel>? fetchedPosts = await userProvider.getAllPosts();
-    List<UserModel> fetchedFollowings = await userProvider.getFollowings();
+    List<UserModel> fetchedFollowings = await userProvider.getFollows(userProvider.currentUser!.uid, "following");
     UserModel? currentUser = await userProvider.getUserInfo(userProvider.currentUser!.uid);
 
     List<UserModel> fetchedUsers = [currentUser!, ...fetchedFollowings];

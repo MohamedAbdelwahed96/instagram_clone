@@ -29,7 +29,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
 
-    List<UserModel> fetchedUsers = await userProvider.getFollowings();
+    List<UserModel> fetchedUsers = await userProvider.getFollows(userProvider.currentUser!.uid, "following");
     List<String?> fetchedImages = [];
 
     for (var user in fetchedUsers) {

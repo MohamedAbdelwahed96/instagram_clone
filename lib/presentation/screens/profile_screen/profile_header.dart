@@ -5,6 +5,7 @@ import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/chat_screen.dart';
 import 'package:instagram_clone/presentation/screens/edit_profile_screen.dart';
+import 'package:instagram_clone/presentation/screens/profile_screen/profile_follows.dart';
 import 'package:instagram_clone/presentation/skeleton_loading/profile_header_loading.dart';
 import 'package:provider/provider.dart';
 
@@ -60,10 +61,12 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                   children: [
                     profileStat(widget.user.posts.length, "posts"),
                     InkWell(
-                        onTap: (){},
+                        onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                              ProfileFollows(user: widget.user))),
                         child: profileStat(widget.user.followers.length, "followers")),
                     InkWell(
-                        onTap: (){},
+                        onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                            ProfileFollows(user: widget.user))),
                         child: profileStat(widget.user.following.length, "following")),
                   ],
                 ),
@@ -155,7 +158,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
 
   void toggleFollow() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    await userProvider.followProfile(userProvider.currentUser!.uid, widget.user.uid, context);
+    await userProvider.followProfile(widget.user.uid, context);
     bool follow = await userProvider.checkFollow(userProvider.currentUser!.uid, widget.user.uid);
     setState(() {
       isFollowing = follow;

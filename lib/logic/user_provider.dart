@@ -142,25 +142,25 @@ class UserProvider extends ChangeNotifier {
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
-  Future<List<UserModel>> getFollowings() async {
+  Future<List<UserModel>> getFollows(String userID,String followType) async {
     try {
-      final response = await _store.collection("users").doc(currentUser!.uid).get();
-      final followingIds = List<String>.from((response.data() as Map<String, dynamic>)["following"] ?? []);
+      final response = await _store.collection("users").doc(userID).get();
+      final followIDs = List<String>.from((response.data() as Map<String, dynamic>)[followType] ?? []);
 
-      if (followingIds.isEmpty) return [];
+      if (followIDs.isEmpty) return [];
 
-      List<UserModel> followingUsers = [];
+      List<UserModel> followUsers = [];
 
       // chunks of 10 (Firestore limit for whereIn)
-      for (var i = 0; i < followingIds.length; i += 10) {
-        final chunk = followingIds.sublist(i, (i + 10 > followingIds.length) ? followingIds.length : i + 10);
+      for (var i = 0; i < followIDs.length; i += 10) {
+        final chunk = followIDs.sublist(i, (i + 10 > followIDs.length) ? followIDs.length : i + 10);
 
         final response = await _store.collection("users").where("uid", whereIn: chunk).get();
 
-        followingUsers.addAll(response.docs.map((doc) => UserModel.fromMap(doc.data())));
+        followUsers.addAll(response.docs.map((doc) => UserModel.fromMap(doc.data())));
       }
 
-      return followingUsers;
+      return followUsers;
     } catch (e) {
       return [];
     }
@@ -221,17 +221,17 @@ class UserProvider extends ChangeNotifier {
     return false;
   }
 
-  Future followProfile(String yourID, followerID, context) async{
+  Future followProfile(userID, context) async{
     try{
-      final response = await _store.collection("users").doc(yourID).get();
+      final response = await _store.collection("users").doc(currentUser!.uid).get();
 
-      if((response.data() as dynamic)["following"].contains(followerID)){
-        await _store.collection("users").doc(followerID).update({"followers":FieldValue.arrayRemove([yourID])});
-        await _store.collection("users").doc(yourID).update({"following":FieldValue.arrayRemove([followerID])});
+      if((response.data() as dynamic)["following"].contains(userID)){
+        await _store.collection("users").doc(userID).update({"followers":FieldValue.arrayRemove([currentUser!.uid])});
+        await _store.collection("users").doc(currentUser!.uid).update({"following":FieldValue.arrayRemove([userID])});
       }
       else {
-        await _store.collection("users").doc(followerID).update({"followers":FieldValue.arrayUnion([yourID])});
-        await _store.collection("users").doc(yourID).update({"following":FieldValue.arrayUnion([followerID])});}
+        await _store.collection("users").doc(userID).update({"followers":FieldValue.arrayUnion([currentUser!.uid])});
+        await _store.collection("users").doc(currentUser!.uid).update({"following":FieldValue.arrayUnion([userID])});}
       notifyListeners();
     }
     catch(e){

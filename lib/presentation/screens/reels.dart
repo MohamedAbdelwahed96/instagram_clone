@@ -118,7 +118,7 @@ class _ReelsState extends State<Reels> {
                                   text: isFollowing ? "unfollow".tr() : "follow".tr(),
                                   recognizer: TapGestureRecognizer()..onTap = () async {
                                       setState(() => isFollowing = !isFollowing);
-                                      await provider.followProfile(provider.currentUser!.uid, widget.reel.userId, context);
+                                      await provider.followProfile(widget.reel.userId, context);
                                     },
                                 ),
                               ],
