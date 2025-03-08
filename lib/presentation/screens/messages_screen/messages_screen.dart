@@ -88,7 +88,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
             leading: CircleAvatar(
               backgroundImage: NetworkImage(usersPfp[index]!)),
             title: Text(user.fullName),
-            subtitle: Text((chat.senderId == widget.user.uid ? "${"you".tr()}: " : "") + chat.message,
+            subtitle: Text(
+                (chat.senderId == widget.user.uid ? "${"you".tr()}: " : "") + chat.message,
               style: TextStyle(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
               maxLines: 1, overflow: TextOverflow.ellipsis),
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>

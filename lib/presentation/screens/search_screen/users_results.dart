@@ -23,24 +23,21 @@ String? userImg;
   }
 
   void fetchData() async {
-    final media = Provider.of<MediaProvider>(context, listen: false);
-    String? firstImg = await media.getImage(bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
+    String? firstImg = await Provider.of<MediaProvider>(context, listen: false)
+        .getImage(bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
     setState(() => userImg = firstImg);
   }
 
 @override
 void didUpdateWidget(covariant UsersResults oldWidget) {
   super.didUpdateWidget(oldWidget);
-  if (oldWidget.user.uid != widget.user.uid) {
-    fetchData();
-  }
+  if (oldWidget.user.uid != widget.user.uid) fetchData();
 }
 
   @override
   Widget build(BuildContext context) {
-    if(userImg==null){
-      return SkeletonSearchUsers();
-    }
+    if (userImg == null) return SkeletonSearchUsers();
+
     return InkWell(
       onTap: ()=> Navigator.push(context,MaterialPageRoute(
             builder: (context) => ProfileScreen(profileID: widget.user.uid),),),

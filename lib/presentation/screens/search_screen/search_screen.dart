@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/post_model.dart';
 import 'package:instagram_clone/data/user_model.dart';
@@ -38,8 +37,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
     if (_posts == null) return const Center(child: CircularProgressIndicator());
+    final theme = Theme.of(context).colorScheme;
 
     return Consumer<UserProvider>(builder: (context, provider, _){
       return SafeArea(
@@ -56,7 +55,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     filled: true,
                     fillColor: theme.inversePrimary,
                     prefixIcon: Padding(padding: const EdgeInsets.all(16), child: IconsWidget(icon: "search")),
-                    suffixIcon: formControllers.search.text.isEmpty?null:IconButton(
+                    suffixIcon: formControllers.search.text.isEmpty ? null
+                        : IconButton(
                       onPressed: ()=> setState(() => formControllers.search.clear()),
                       icon: Icon(Icons.clear),),
                     hintText: "search".tr(),
@@ -92,7 +92,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         itemBuilder: (context, index){
                           return UsersResults(user: _users![index]);
                         })
-                )
+                ),
             ],
           ),
         ),
