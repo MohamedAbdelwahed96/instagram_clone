@@ -30,7 +30,7 @@ class _ContactsState extends State<Contacts> {
 
     final image = await mediaProvider.getImage(
         bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
-    bool follow = await userProvider.checkFollow(userProvider.currentUser!.uid, widget.user.uid);
+    bool follow = await userProvider.checkFollow(widget.user.uid);
 
     setState(() {
       userPfp = image;
@@ -41,12 +41,14 @@ class _ContactsState extends State<Contacts> {
   void toggleFollow() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     await userProvider.followProfile(widget.user.uid, context);
-    bool follow = await userProvider.checkFollow(userProvider.currentUser!.uid, widget.user.uid);
+    bool follow = await userProvider.checkFollow(widget.user.uid);
     setState(() => isFollowing = follow);
   }
 
   @override
   Widget build(BuildContext context) {
+    if(userPfp == null) return Center(child: CircularProgressIndicator());
+
     final screen = MediaQuery.of(context).size;
     final theme = Theme.of(context).colorScheme;
 

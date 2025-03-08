@@ -80,7 +80,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               icon: Icon(Icons.arrow_back),
               onPressed: () {
                 mediaProvider.mediaFile = null;
-                Navigator.pop(context);
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) => NavigationBotBar(index: 4)));
               },
             ),
             actions: [
@@ -106,9 +107,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           gender, pfpUrl)
                       .then((v) {
                     mediaProvider.mediaFile = null;
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
+                    Navigator.pushReplacement(context, MaterialPageRoute(
                             builder: (context) => NavigationBotBar(index: 4)));
                   });
                 },

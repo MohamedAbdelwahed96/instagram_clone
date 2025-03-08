@@ -68,7 +68,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ListTile(
                                       onTap: () {
                                         context.setLocale(Locale("en"));
-                                        provider.setLanguage(userID: widget.user.uid, language: "en");
                                         Navigator.pop(context);
                                       },
                                       leading: Text("EN"),
@@ -77,7 +76,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ListTile(
                                       onTap: () {
                                         context.setLocale(Locale("ar"));
-                                        provider.setLanguage(userID: widget.user.uid, language: "ar");
                                         Navigator.pop(context);
                                       },
                                       leading: Text("AR"),

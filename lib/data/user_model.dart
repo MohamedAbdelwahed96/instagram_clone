@@ -14,7 +14,6 @@ class UserModel {
   final String gender;
   final String website;
   final DateTime time;
-  final String language;
   final String fcmToken;
 
   UserModel({
@@ -33,7 +32,6 @@ class UserModel {
     required this.gender,
     this.website = "",
     required this.time,
-    this.language = "en",
     this.fcmToken = "",
   });
 
@@ -54,7 +52,6 @@ class UserModel {
       gender: map['gender'] ?? '',
       website: map['website'] ?? '',
       time: map['time'] != null ? DateTime.parse(map['time']) : DateTime.now(),
-      language: map['language'] ?? 'en',
       fcmToken: map['fcmToken'] ?? '',
     );
   }
@@ -76,7 +73,6 @@ class UserModel {
       'gender': gender,
       'website': website,
       'time': time.toIso8601String(),
-      'language': language,
       'fcmToken': fcmToken,
     };
   }

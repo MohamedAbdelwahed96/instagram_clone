@@ -31,7 +31,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     String? profilePicture = await Provider.of<MediaProvider>(context, listen: false)
         .getImage(bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
-    bool follow = await userProvider.checkFollow(userProvider.currentUser!.uid, widget.user.uid);
+    bool follow = await userProvider.checkFollow(widget.user.uid);
     setState(() {
       img = profilePicture;
       isFollowing = follow;
@@ -159,7 +159,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
   void toggleFollow() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     await userProvider.followProfile(widget.user.uid, context);
-    bool follow = await userProvider.checkFollow(userProvider.currentUser!.uid, widget.user.uid);
+    bool follow = await userProvider.checkFollow(widget.user.uid);
     setState(() {
       isFollowing = follow;
       if (isFollowing) {

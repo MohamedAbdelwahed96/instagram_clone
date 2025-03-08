@@ -39,7 +39,7 @@ class _ReelsState extends State<Reels> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
     userProvider.viewReel(reelID: widget.reel.reelId);
-    bool follow = await userProvider.checkFollow(userProvider.currentUser!.uid, widget.reel.userId);
+    bool follow = await userProvider.checkFollow(widget.reel.userId);
 
     final fetchedUser = await userProvider.getUserInfo(widget.reel.userId);
     final pfp = await mediaProvider.getImage(bucketName: "images", folderName: "uploads", fileName: fetchedUser!.pfpUrl);

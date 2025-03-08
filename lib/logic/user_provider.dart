@@ -142,7 +142,7 @@ class UserProvider extends ChangeNotifier {
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
-  Future<List<UserModel>> getFollows(String userID,String followType) async {
+  Future<List<UserModel>> getFollows(String userID, String followType) async {
     try {
       final response = await _store.collection("users").doc(userID).get();
       final followIDs = List<String>.from((response.data() as Map<String, dynamic>)[followType] ?? []);
@@ -215,8 +215,8 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> checkFollow(String yourID, followerID) async{
-    final response = await _store.collection("users").doc(yourID).get();
+  Future<bool> checkFollow(String followerID) async{
+    final response = await _store.collection("users").doc(currentUser!.uid).get();
     if ((response.data() as dynamic)["following"].contains(followerID)) return true;
     return false;
   }
@@ -262,14 +262,14 @@ class UserProvider extends ChangeNotifier {
    }
  }
 
-  Future setLanguage({required String userID, required String language}) async{
-    await _store.collection("users").doc(userID).update({"language": language});
-    notifyListeners();
-  }
-
   String chatId(String userId) => currentUser!.uid.compareTo(userId) < 0 ?
   "${currentUser!.uid}\_$userId" : "$userId\_${currentUser!.uid}";
 
+  // Future setLanguage({required String userID, required String language}) async{
+  //   await _store.collection("users").doc(userID).update({"language": language});
+  //   notifyListeners();
+  // }
+  //
   // Future changePassword(context, String newPassword) async {
   //   await currentUser!.updatePassword(newPassword);
   //   showScaffoldMSG(context, "password_updated".tr());
