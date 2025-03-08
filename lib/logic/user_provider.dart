@@ -265,11 +265,6 @@ class UserProvider extends ChangeNotifier {
   String chatId(String userId) => currentUser!.uid.compareTo(userId) < 0 ?
   "${currentUser!.uid}\_$userId" : "$userId\_${currentUser!.uid}";
 
-  // Future setLanguage({required String userID, required String language}) async{
-  //   await _store.collection("users").doc(userID).update({"language": language});
-  //   notifyListeners();
-  // }
-  //
   // Future changePassword(context, String newPassword) async {
   //   await currentUser!.updatePassword(newPassword);
   //   showScaffoldMSG(context, "password_updated".tr());
