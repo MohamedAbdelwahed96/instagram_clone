@@ -43,6 +43,42 @@ void showScaffoldMSG(BuildContext context, String msg) {
   );
 }
 
+void showLanguages(BuildContext context){
+  showDialog(context: context,
+      builder: (context) {
+        return Dialog(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.15,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ListTile(
+                    onTap: () {
+                      context.setLocale(Locale("en"));
+                      Navigator.pop(context);
+                    },
+                    leading: Text("EN"),
+                    title: Text("english".tr()),
+                  ),
+                  ListTile(
+                    onTap: () {
+                      context.setLocale(Locale("ar"));
+                      Navigator.pop(context);
+                    },
+                    leading: Text("AR"),
+                    title: Text("arabic".tr()),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      });
+}
+
 void showAddNewList(BuildContext context) {
   showModalBottomSheet(context: context,
     builder: (context) {
