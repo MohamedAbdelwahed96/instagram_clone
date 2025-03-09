@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
-import 'package:instagram_clone/presentation/screens/chat_screen.dart';
+import 'package:instagram_clone/presentation/screens/chat_screen/chat_screen.dart';
 import 'package:instagram_clone/presentation/screens/edit_profile_screen.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_follows.dart';
 import 'package:instagram_clone/presentation/skeleton_loading/profile_header_loading.dart';

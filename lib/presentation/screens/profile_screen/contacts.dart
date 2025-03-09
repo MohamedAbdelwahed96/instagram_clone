@@ -64,6 +64,7 @@ class _ContactsState extends State<Contacts> {
         onTap: toggleFollow,
         child: Container(
           width: screen.width * .25,
+          height: screen.height * 0.05,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: isFollowing! ? Colors.grey.withOpacity(0.2) : Colors.blue,

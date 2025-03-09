@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
-import 'package:instagram_clone/presentation/screens/chat_screen.dart';
+import 'package:instagram_clone/presentation/screens/chat_screen/chat_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
