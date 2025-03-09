@@ -27,33 +27,31 @@ Future<bool?> showConfirmationDialog(BuildContext context, String title, String 
 }
 
 void showScaffoldMSG(BuildContext context, String msg) {
+  final theme = Theme.of(context).colorScheme;
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(msg.tr(),
-        style: TextStyle(color: Theme.of(context).colorScheme.primary),
-      ),
-      backgroundColor: Theme.of(context).colorScheme.surface,
+        style: TextStyle(color: theme.primary)),
+      backgroundColor: theme.surface,
+      behavior: SnackBarBehavior.floating,
       action: SnackBarAction(
         label: "dismiss".tr(),
-        textColor: Theme.of(context).colorScheme.primary,
+        textColor: theme.primary,
         onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
       ),
-      behavior: SnackBarBehavior.floating, // Optional: Floating style
     ),
   );
 }
 
-void showLanguages(BuildContext context){
-  showDialog(context: context,
+void showLanguages(BuildContext context) {
+  showDialog(
+      context: context,
       builder: (context) {
         return Dialog(
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.15,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: IntrinsicHeight(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   ListTile(
                     onTap: () {
