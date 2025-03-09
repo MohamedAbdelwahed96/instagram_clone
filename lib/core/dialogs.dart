@@ -4,6 +4,28 @@ import 'package:instagram_clone/presentation/screens/new_post.dart';
 import 'package:instagram_clone/presentation/screens/new_reel.dart';
 import 'package:instagram_clone/presentation/screens/new_story.dart';
 
+Future<bool?> showConfirmationDialog(BuildContext context, String title, String message) {
+  return showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text("no".tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text("yes".tr()),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 void showScaffoldMSG(BuildContext context, String msg) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -21,7 +43,7 @@ void showScaffoldMSG(BuildContext context, String msg) {
   );
 }
 
-void addNew(BuildContext context) {
+void showAddNewList(BuildContext context) {
   showModalBottomSheet(context: context,
     builder: (context) {
       final screen = MediaQuery.of(context).size;

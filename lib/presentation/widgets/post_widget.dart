@@ -11,7 +11,6 @@ import 'package:instagram_clone/presentation/widgets/video_player_widget.dart';
 import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'confirm_message.dart';
 
 class PostWidget extends StatefulWidget {
   final PostModel post;
@@ -76,14 +75,7 @@ class _PostWidgetState extends State<PostWidget> {
                         onPressed: () {},
                         icon: PopupMenuButton<String>(
                           onSelected: (value) async {
-                            if (value == "Delete") {
-                              bool? confirmDelete = await showConfirmationDialog(
-                                  context, "delete_post".tr(),
-                                  "confirm_delete_post".tr());
-                              if (confirmDelete == true) {
-                                await mediaProvider.deletePost(context, widget.post);
-                              }
-                            }
+                            if (value == "Delete") await mediaProvider.deletePost(context, widget.post);
                           },
                           itemBuilder: (context) => [
                             if (widget.post.uid == userProvider.currentUser!.uid)
@@ -96,7 +88,7 @@ class _PostWidgetState extends State<PostWidget> {
                   ),
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height*0.5,
+                  height: MediaQuery.of(context).size.width,
                   child: Stack(
                     children: [
                       PageView.builder(
@@ -112,8 +104,8 @@ class _PostWidgetState extends State<PostWidget> {
                             return isVideo? VideoPlayerWidget(videoUrl: postMedia![index], tapToPlayPause: true)
                                 : Image.network(postMedia![index], fit: BoxFit.cover);
                           }),
-                      widget.post.mediaUrls.length>1?
-                      Positioned(top: 16, right: 16,
+                      if (widget.post.mediaUrls.length > 1)
+                        Positioned(top: 16, right: 16,
                         child: Container(
                           width: 30,
                           height: 22,
@@ -126,7 +118,6 @@ class _PostWidgetState extends State<PostWidget> {
                           ),
                         ),
                       )
-                          :SizedBox(),
                     ],
                   ),
                 ),

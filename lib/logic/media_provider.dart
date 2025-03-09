@@ -9,7 +9,7 @@ import 'package:instagram_clone/data/story_model.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:instagram_clone/presentation/widgets/scaffold_msg.dart';
+import 'package:instagram_clone/core/dialogs.dart';
 
 class MediaProvider extends ChangeNotifier{
   final _supa = Supabase.instance.client.storage;
@@ -119,6 +119,10 @@ class MediaProvider extends ChangeNotifier{
 
   Future deletePost(context, PostModel post) async {
     try{
+      bool? confirmDelete = await showConfirmationDialog(
+        context, "delete_post".tr(), "confirm_delete_post".tr(),);
+      if (confirmDelete != true) return;
+
       final user = Provider.of<UserProvider>(context, listen: false).currentUser!.uid;
       await _store.collection('posts').doc(post.postId).delete();
       await _store.collection("users").doc(user).update({"posts":FieldValue.arrayRemove([post.postId])});

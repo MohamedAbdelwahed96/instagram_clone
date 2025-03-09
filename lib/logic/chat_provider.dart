@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/core/dialogs.dart';
 import 'package:instagram_clone/data/chat_model.dart';
 import 'package:instagram_clone/services/notification.dart';
 
@@ -64,7 +66,11 @@ class ChatProvider extends ChangeNotifier {
     // }
   }
 
-  Future deleteMessage(String chatId, String msgId) async {
+  Future deleteMessage(context, String chatId, String msgId) async {
+    bool? confirmDelete = await showConfirmationDialog(
+      context, "delete_message".tr(), "confirm_delete_message".tr());
+    if (confirmDelete != true) return;
+
     await _dbRef.child("chats/$chatId/messages/$msgId").remove();
     chats[chatId]?.removeWhere((msg) => msg.messageId == msgId);
     notifyListeners();

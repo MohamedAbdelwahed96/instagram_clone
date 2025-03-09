@@ -8,8 +8,6 @@ import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_screen.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/confirm_message.dart';
-
 class ChatScreen extends StatefulWidget {
   final String chatId;
   final String currentUserId;
@@ -48,11 +46,11 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     if (userImg == null) return CircularProgressIndicator();
 
-    return Consumer<ChatProvider>(builder: (context, provider, _){
-      final theme = Theme.of(context).colorScheme;
-      final screen = MediaQuery.of(context).size;
-      final messages = provider.chats[widget.chatId] ?? [];
+    final theme = Theme.of(context).colorScheme;
+    final screen = MediaQuery.of(context).size;
 
+    return Consumer<ChatProvider>(builder: (context, provider, _){
+      final messages = provider.chats[widget.chatId] ?? [];
       return Scaffold(
         body: SafeArea(
           child: Column(
@@ -79,10 +77,10 @@ class _ChatScreenState extends State<ChatScreen> {
               Expanded(
                 child: ListView.builder(
                   reverse: true,
-                  padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
-                    final isMe = messages[index].senderId==widget.currentUserId;
+                    final bool isMe = messages[index].senderId==widget.currentUserId;
                     final bool isPreviousSameUser = index < messages.length - 1 &&
                         messages[index].senderId == messages[index + 1].senderId;
                     final bool isLastFromUser = index == 0 ||
@@ -93,48 +91,26 @@ class _ChatScreenState extends State<ChatScreen> {
                       children: [
                         if (!isMe && isLastFromUser) InkWell(
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                              ProfileScreen(profileID: widget.user!.uid),
-                          ),
-                          ),
+                              ProfileScreen(profileID: widget.user!.uid),),),
                             child: CircleAvatar(foregroundImage: NetworkImage(userImg!))),
                         if (!isMe && !isLastFromUser) SizedBox(width: screen.width*0.1),
-                          InkWell(
-                          onLongPress: () {
-                            if (isMe) {
-                              showDialog(context: context, builder: (context){
-                                return Dialog(
-                                  child: Container(
-                                    height: screen.height*0.1,
-                                    color: theme.inversePrimary,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          ListTile(
-                                            onTap: () async{
-                                              bool? confirmDelete = await showConfirmationDialog(context,
-                                                  "delete_message".tr(), "confirm_delete_message".tr());
-                                              if (confirmDelete == true) await provider.deleteMessage(widget.chatId, messages[index].messageId!);
-                                              Navigator.pop(context);
-                                            },
-                                            leading: Icon(Icons.delete, size: 24, color: theme.primary),
-                                            title: Text("delete_message".tr()),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              });
-                            }
+                        PopupMenuButton<String>(
+                          onSelected: (value) async {
+                            if (value == "delete") await provider.deleteMessage(context, widget.chatId, messages[index].messageId!);
                           },
+                          itemBuilder: (context) => [
+                            if (isMe)
+                              PopupMenuItem(value: "delete",
+                                child: ListTile(
+                                  leading: Icon(Icons.delete),
+                                  title: Text("delete_message".tr()),
+                                ),
+                              ),
+                          ],
                           child: Container(
-                            constraints: BoxConstraints(
-                                maxWidth: screen.width * 0.7),
-                            margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
-                            padding: EdgeInsets.all(10.0),
+                            constraints: BoxConstraints(maxWidth: screen.width * 0.7),
+                            margin: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                            padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: isMe ? Colors.blue : Colors.grey[300],
                               borderRadius: BorderRadius.only(
@@ -144,7 +120,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                 bottomRight: Radius.circular(12),
                               ),
                             ),
-                            child: Text(messages[index].message,
+                            child: Text(
+                              messages[index].message,
                               style: TextStyle(color: isMe ? Colors.white : Colors.black),
                             ),
                           ),

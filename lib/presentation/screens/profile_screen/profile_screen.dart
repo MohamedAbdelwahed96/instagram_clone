@@ -7,7 +7,7 @@ import 'package:instagram_clone/presentation/screens/profile_screen/profile_post
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_reels.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/tagged_posts.dart';
 import 'package:instagram_clone/presentation/screens/settings_screen.dart';
-import 'package:instagram_clone/presentation/widgets/scaffold_msg.dart';
+import 'package:instagram_clone/core/dialogs.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -56,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: Text(_user!.username, style: TextStyle(fontWeight: FontWeight.bold)),
           actions: [
             IconButton(
-                onPressed: ()=> addNew(context),
+                onPressed: ()=> showAddNewList(context),
                 icon: ImageIcon(AssetImage("assets/icons/new_post.png"))),
             IconButton(
               onPressed: () => Navigator.push(

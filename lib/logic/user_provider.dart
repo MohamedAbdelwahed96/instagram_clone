@@ -7,7 +7,7 @@ import 'package:instagram_clone/data/reel_model.dart';
 import 'package:instagram_clone/data/story_model.dart';
 import '/data/post_model.dart';
 import '/data/user_model.dart';
-import 'package:instagram_clone/presentation/widgets/scaffold_msg.dart';
+import 'package:instagram_clone/core/dialogs.dart';
 
 class UserProvider extends ChangeNotifier {
   final _auth = FirebaseAuth.instance;
