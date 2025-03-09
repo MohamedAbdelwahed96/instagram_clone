@@ -6,7 +6,6 @@ import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/login_screen.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/liked_posts.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/saved_posts.dart';
-import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -100,7 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   onTap: ()=> Navigator.pushReplacement(context, MaterialPageRoute(
                       builder: (context) => LikedPosts(user: widget.user))),
-                  leading: IconsWidget(icon: "like"),
+                  leading: ImageIcon(AssetImage("assets/icons/like.png")),
                   title: Text("favorite".tr()),
                 ),
                 ListTile(

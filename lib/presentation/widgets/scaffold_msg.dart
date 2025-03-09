@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:instagram_clone/presentation/screens/new_post.dart';
 import 'package:instagram_clone/presentation/screens/new_reel.dart';
 import 'package:instagram_clone/presentation/screens/new_story.dart';
-import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 
 void showScaffoldMSG(BuildContext context, String msg) {
   ScaffoldMessenger.of(context).showSnackBar(
@@ -50,7 +49,7 @@ Widget listTile(BuildContext context, dynamic icon, double width, String title, 
   return Column(
     children: [
       ListTile(
-        leading: icon is IconData ? Icon(icon) : IconsWidget(icon: icon),
+        leading: icon is IconData ? Icon(icon) : ImageIcon(AssetImage("assets/icons/$icon.png")),
         title: Text(title, style: TextStyle(fontSize: 18)),
         onTap: () {
           Navigator.pop(context);

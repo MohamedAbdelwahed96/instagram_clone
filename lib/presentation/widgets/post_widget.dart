@@ -12,7 +12,6 @@ import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'confirm_message.dart';
-import 'icons_widget.dart';
 
 class PostWidget extends StatefulWidget {
   final PostModel post;
@@ -131,54 +130,48 @@ class _PostWidgetState extends State<PostWidget> {
                     ],
                   ),
                 ),
-                widget.post.mediaUrls.length > 1?
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(widget.post.mediaUrls.length,
-                        (index) => Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
-                      width: _currentPage == index ? 10 : 8,
-                      height: _currentPage == index ? 10 : 8,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _currentPage == index
-                            ? theme.primary : theme.inversePrimary,
-                      ),
+                if (widget.post.mediaUrls.length > 1)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        widget.post.mediaUrls.length, (index) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
+                        width: _currentPage == index ? 10 : 8,
+                        height: _currentPage == index ? 10 : 8,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentPage == index ? theme.primary : theme.inversePrimary,
+                        ),
                     ),
                   ),
-                )
-                    :SizedBox(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 11),
-                  child: Row(
-                    children: [
-                      IconsWidget(
-                        icon: isLiked ? "like_filled" : "like",
-                        color: isLiked ? Colors.red : Theme.of(context).colorScheme.primary,
-                        onTap: (){
-                          final userID = userProvider.currentUser!.uid;
-                          setState(() {
-                            isLiked=!isLiked;
-                            if (isLiked) {
-                              widget.post.likes.add(userID);
-                            } else {
-                              widget.post.likes.remove(userID);
-                            }
-                          });
-                          userProvider.like(mediaType: "posts", mediaID: widget.post.postId);
-                        }),
-                      SizedBox(width: 12),
-                      IconsWidget(icon: "comment"),
-                      SizedBox(width: 12),
-                      IconsWidget(icon: "share"),
-                      Spacer(),
-                      IconsWidget(onTap: () {
-                        final userID = userProvider.currentUser!.uid;
-                        userProvider.savePost(context, userID: userID, postID: widget.post.postId);
-                        setState(() => isSaved=!isSaved);
-                      }, icon: isSaved==false?"save":"save_filled"),
-                    ],
-                  ),
+                ),
+                Row(
+                  children: [
+                    IconButton(onPressed: (){
+                      setState(() {
+                        isLiked=!isLiked;
+                        if (isLiked) {
+                          widget.post.likes.add(userProvider.currentUser!.uid);
+                        } else {
+                          widget.post.likes.remove(userProvider.currentUser!.uid);
+                        }
+                      });
+                      userProvider.like(mediaType: "posts", mediaID: widget.post.postId);
+                    },
+                        icon: ImageIcon(AssetImage(
+                            "assets/icons/${isLiked ? "like_filled" : "like"}.png"),
+                          color: isLiked ? Colors.red : Theme.of(context).colorScheme.primary,
+                        )),
+                    ImageIcon(AssetImage("assets/icons/comment.png")),
+                    IconButton(onPressed: (){}, icon: ImageIcon(AssetImage("assets/icons/share.png"))),
+                    Spacer(),
+                    IconButton(onPressed: (){
+                      final userID = userProvider.currentUser!.uid;
+                      userProvider.savePost(context, userID: userID, postID: widget.post.postId);
+                      setState(() => isSaved=!isSaved);
+                    }, icon: ImageIcon(AssetImage(
+                        "assets/icons/${isSaved ? "save_filled" : "save"}.png"),)),
+                  ],
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),

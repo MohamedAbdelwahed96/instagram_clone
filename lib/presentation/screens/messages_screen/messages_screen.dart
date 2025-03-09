@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/chat_screen.dart';
 import 'package:instagram_clone/presentation/screens/messages_screen/new_message_screen.dart';
-import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:instagram_clone/data/chat_model.dart';
 import 'package:instagram_clone/data/user_model.dart';
@@ -68,11 +67,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),),
         actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: IconsWidget(icon: "new_message", size: 32,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                NewMessageScreen(currentUserId: widget.user.uid),),)
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: IconButton(
+                onPressed: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => NewMessageScreen(currentUserId: widget.user.uid))),
+                icon: ImageIcon(AssetImage("assets/icons/new_message.png"), size: 32)),
           )
         ],
       ),

@@ -8,7 +8,6 @@ import 'package:instagram_clone/presentation/screens/messages_screen/messages_sc
 import 'package:instagram_clone/presentation/skeleton_loading/home_screen_loading.dart';
 import 'package:provider/provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
-import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 import 'package:instagram_clone/presentation/widgets/post_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -54,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     if (_posts == null || pfpUrls == null || users == null) return SkeletonHomeScreen();
+    final theme = Theme.of(context).colorScheme;
     return SafeArea(
       child: Scaffold(
         body: CustomScrollView(
@@ -64,24 +64,28 @@ class _HomeScreenState extends State<HomeScreen> {
               snap: true,
               automaticallyImplyLeading: false,
               flexibleSpace: Material(
-                color: Theme.of(context).colorScheme.surface,
+                color: theme.surface,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
                       Image.asset("assets/images/Logo.png",
                           width: MediaQuery.of(context).size.width * 0.26,
-                          color: Theme.of(context).colorScheme.primary),
+                          color: theme.primary),
                       SizedBox(width: 8),
                       Icon(Icons.arrow_drop_down),
                       Spacer(),
-                      IconsWidget(icon: "like"),
-                      SizedBox(width: 24),
-                      IconsWidget(icon: "chat",
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => MessagesScreen(user: users![0],))),),
-                      SizedBox(width: 24),
-                      IconsWidget(icon: "new_post",
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewPostScreen())),),
+                      IconButton(
+                          onPressed: (){},
+                          icon: ImageIcon(AssetImage("assets/icons/like.png"))),
+                      IconButton(
+                          onPressed: () => Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => MessagesScreen(user: users![0],))),
+                          icon: ImageIcon(AssetImage("assets/icons/chat.png"))),
+                      IconButton(
+                          onPressed: () => Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => NewPostScreen())),
+                          icon: ImageIcon(AssetImage("assets/icons/new_post.png"))),
                     ],
                   ),
                 ),

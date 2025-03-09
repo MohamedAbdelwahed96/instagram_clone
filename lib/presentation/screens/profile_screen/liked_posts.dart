@@ -6,7 +6,6 @@ import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/posts_screen.dart';
 import 'package:instagram_clone/presentation/skeleton_loading/profile_posts_loading.dart';
-import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 import 'package:instagram_clone/presentation/widgets/video_player_widget.dart';
 import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
@@ -80,7 +79,8 @@ class _LikedPostsState extends State<LikedPosts> {
                 ),
                 _posts![index].mediaUrls.length > 1
                     ? Positioned(top: 10, right: 10,
-                  child: IconsWidget(icon: "multiple", color: Colors.white),
+                  child:
+                    ImageIcon(AssetImage("assets/icons/multiple.png"), color: Colors.white)
                 )
                     : SizedBox(),
               ],

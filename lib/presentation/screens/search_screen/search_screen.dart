@@ -6,7 +6,6 @@ import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/search_screen/posts_results.dart';
 import 'package:instagram_clone/presentation/screens/search_screen/users_results.dart';
-import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -54,7 +53,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: theme.inversePrimary,
-                    prefixIcon: Padding(padding: const EdgeInsets.all(16), child: IconsWidget(icon: "search")),
+                    prefixIcon: Padding(padding: const EdgeInsets.all(16),
+                        child: ImageIcon(AssetImage("assets/icons/search.png"))),
                     suffixIcon: formControllers.search.text.isEmpty ? null
                         : IconButton(
                       onPressed: ()=> setState(() => formControllers.search.clear()),

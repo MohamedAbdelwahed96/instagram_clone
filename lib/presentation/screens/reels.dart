@@ -7,8 +7,6 @@ import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_screen.dart';
 import 'package:instagram_clone/presentation/skeleton_loading/reels_loading.dart';
-import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
-import 'package:instagram_clone/presentation/widgets/navigation_bot_bar.dart';
 import 'package:instagram_clone/presentation/widgets/video_player_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -89,7 +87,6 @@ class _ReelsState extends State<Reels> {
                   ],
                 ),
                 SizedBox(height: 8),
-                // User details
                 Row(
                   children: [
                     InkWell(
@@ -134,28 +131,21 @@ class _ReelsState extends State<Reels> {
                   ],
                 ),
                 Spacer(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Text(
-                    "${widget.reel.views.length} ${"views".tr()}  ·  ${widget.reel.comments.length} ${"comments".tr()}",
-                    style: TextStyle(color: Colors.white),
-                  ),
+                Text(
+                  "${widget.reel.views.length} ${"views".tr()}  ·  ${widget.reel.comments.length} ${"comments".tr()}",
+                  style: TextStyle(color: Colors.white),
                 ),
                 Row(
                   children: [
-                    IconsWidget(
-                        icon: isLiked ? "like_filled" : "like",
-                        color: isLiked ? Colors.red : Colors.white,
-                        onTap: (){
-                          setState(() => isLiked=!isLiked);
-                          provider.like(mediaType: "reels", mediaID: widget.reel.reelId);
-                        }),
-                    SizedBox(width: 18),
-                    IconsWidget(icon: "comment", color: Colors.white),
-                    SizedBox(width: 18),
-                    IconsWidget(icon: "share", color: Colors.white),
-                    SizedBox(width: 18),
-                    Icon(Icons.more_horiz, color: Colors.white),
+                    InkWell(onTap: () {
+                      setState(() => isLiked = !isLiked);
+                      provider.like(mediaType: "reels", mediaID: widget.reel.reelId);
+                      },
+                        child: ImageIcon(AssetImage("assets/icons/${isLiked ? "like_filled" : "like"}.png"),
+                            color: isLiked ? Colors.red : Colors.white)),
+                    IconButton(onPressed: (){}, icon: ImageIcon(AssetImage("assets/icons/comment.png"), color: Colors.white)),
+                    InkWell(onTap: () {}, child: ImageIcon(AssetImage("assets/icons/share.png"), color: Colors.white)),
+                    IconButton(onPressed: (){}, icon: Icon(Icons.more_horiz, color: Colors.white))
                   ],
                 ),
               ],

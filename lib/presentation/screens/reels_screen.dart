@@ -39,6 +39,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.black,
         body: PageView.builder(
             scrollDirection: Axis.vertical,
             itemCount: _reels!.length,

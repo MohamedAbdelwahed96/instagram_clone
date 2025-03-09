@@ -7,7 +7,6 @@ import 'package:instagram_clone/presentation/screens/profile_screen/profile_post
 import 'package:instagram_clone/presentation/screens/profile_screen/profile_reels.dart';
 import 'package:instagram_clone/presentation/screens/profile_screen/tagged_posts.dart';
 import 'package:instagram_clone/presentation/screens/settings_screen.dart';
-import 'package:instagram_clone/presentation/widgets/icons_widget.dart';
 import 'package:instagram_clone/presentation/widgets/scaffold_msg.dart';
 import 'package:provider/provider.dart';
 
@@ -56,13 +55,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             :AppBar(
           title: Text(_user!.username, style: TextStyle(fontWeight: FontWeight.bold)),
           actions: [
-            IconsWidget(icon: "new_post",
-              onTap: ()=> addNew(context),),
-            SizedBox(width: 8),
             IconButton(
-              icon: Icon(Icons.menu, size: 32),
+                onPressed: ()=> addNew(context),
+                icon: ImageIcon(AssetImage("assets/icons/new_post.png"))),
+            IconButton(
               onPressed: () => Navigator.push(
                   context, MaterialPageRoute(builder: (context)=>SettingsScreen(user: _user!))),
+              icon: Icon(Icons.menu, size: 32),
             ),
           ],
         ),
