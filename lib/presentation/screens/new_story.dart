@@ -3,9 +3,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/story_model.dart';
-import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/widgets/navigation_bot_bar.dart';
@@ -22,27 +20,7 @@ class NewStory extends StatefulWidget {
 }
 
 class _NewStoryState extends State<NewStory> {
-  final formControllers = FormControllers();
-  UserModel? user;
   bool _isVideo = false;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-  }
-
-  void fetchData() async {
-    final usr = Provider.of<UserProvider>(context, listen: false);
-    UserModel? fetchedUser = await usr.getUserInfo(usr.currentUser!.uid);
-    setState(() => user = fetchedUser);
-  }
-
-  @override
-  void dispose() {
-    formControllers.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,13 +42,15 @@ class _NewStoryState extends State<NewStory> {
                 : IconButton(
               icon: Icon(Icons.upload, color: provider.mediaFile != null ? theme.primary : theme.primary.withOpacity(0.5)),
               onPressed: provider.mediaFile == null ? null
-                  : () async {final storyID = const Uuid().v1();
+                  : () async {
+                final storyID = const Uuid().v1();
+                final userID = Provider.of<UserProvider>(context).currentUser!.uid;
                 await provider.uploadMedia(context, bucketName: "stories", folder: storyID);
                 if (provider.filename == null) return;
                 await provider.uploadStory(context,
                     StoryModel(
                         storyId: storyID,
-                        userId: user!.uid,
+                        userId: userID,
                         mediaUrl: provider.filename!,
                         isVideo: _isVideo,
                         createdAt: DateTime.now())

@@ -56,7 +56,7 @@ class _ContactsState extends State<Contacts> {
       onTap: () => Navigator.push(context,
           MaterialPageRoute(builder: (context) => ProfileScreen(profileID: widget.user.uid))
       ),
-      leading: CircleAvatar(backgroundImage: NetworkImage(userPfp ?? "")),
+      leading: CircleAvatar(backgroundImage: NetworkImage(userPfp!)),
       title: Text(widget.user.fullName),
       subtitle: Text(widget.user.username, style: TextStyle(color: theme.primary.withOpacity(0.5))),
       trailing: widget.user.uid == Provider.of<UserProvider>(context, listen: false).currentUser!.uid ? null

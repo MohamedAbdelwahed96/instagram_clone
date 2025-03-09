@@ -4,7 +4,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/core/controllers.dart';
 import 'package:instagram_clone/data/reel_model.dart';
-import 'package:instagram_clone/data/user_model.dart';
 import 'package:instagram_clone/logic/media_provider.dart';
 import 'package:instagram_clone/logic/user_provider.dart';
 import 'package:instagram_clone/presentation/widgets/navigation_bot_bar.dart';
@@ -21,19 +20,6 @@ class NewReel extends StatefulWidget {
 
 class _NewReelState extends State<NewReel> {
   final formControllers = FormControllers();
-  UserModel? user;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-  }
-
-  void fetchData() async {
-    final usr = Provider.of<UserProvider>(context, listen: false);
-    UserModel? fetchedUser = await usr.getUserInfo(usr.currentUser!.uid);
-    setState(() => user = fetchedUser);
-  }
 
   @override
   void dispose() {
@@ -63,12 +49,13 @@ class _NewReelState extends State<NewReel> {
               onPressed: provider.mediaFile == null ? null
                   : () async{
                 final reelID = const Uuid().v1();
+                final userID = Provider.of<UserProvider>(context).currentUser!.uid;
                 await provider.uploadMedia(context, bucketName: "reels", folder: reelID);
                 if (provider.filename == null) return;
                 await provider.uploadReel(context,
                     ReelModel(
                         reelId: reelID,
-                        userId: user!.uid,
+                        userId: userID,
                         videoUrl: provider.filename!,
                         createdAt: DateTime.now(),
                         caption: formControllers.caption.text));

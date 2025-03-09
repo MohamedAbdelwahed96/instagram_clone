@@ -57,15 +57,6 @@ class UserProvider extends ChangeNotifier {
     showScaffoldMSG(context, "signed_out_successfully");
   }
 
-  Future<UserModel?> getUserInfo(String userID) async {
-    try {
-      final userData = await _store.collection("users").doc(userID).get();
-      return UserModel.fromMap(userData.data() as Map<String, dynamic>);
-    } catch (e) {
-      return null;
-    }
-  }
-
   Future saveInfo(context, String name, username, web, bio, email, phone, gender, pfpUrl) async {
     try {
       if(email!=currentUser!.email) {
@@ -92,54 +83,13 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<PostModel>> getUserPosts(String userID) async {
-      final response = await _store.collection("posts").where("uid", isEqualTo: userID).get();
-      return response.docs.map((e) => PostModel.fromMap(e.data())).toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  }
-
-  Future<List<ReelModel>> getUserReels(String userID) async {
-    final response = await _store.collection("reels").where("userId", isEqualTo: userID).get();
-    return response.docs.map((e) => ReelModel.fromMap(e.data())).toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  }
-
-  Future<List<PostModel>> getLikedPosts(String userID) async {
-    final response = await _store.collection("posts").where("likes", arrayContains: userID).get();
-    return response.docs.map((e) => PostModel.fromMap(e.data())).toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  }
-
-  Future<List<PostModel>> getSavedPosts(String userID) async {
-    final userDoc = await _store.collection("users").doc(userID).get();
-    List<String> savedPostIds = List<String>.from(userDoc.data()!["savedPosts"]);
-    if (savedPostIds.isEmpty) return [];
-
-    List<PostModel> posts = [];
-
-    // chunks of 10 (Firestore limit for whereIn)
-    for (var i = 0; i < savedPostIds.length; i += 10) {
-      final chunk = savedPostIds.sublist(i, i + 10 > savedPostIds.length ? savedPostIds.length : i + 10);
-      final response = await _store.collection("posts")
-          .where(FieldPath.documentId, whereIn: chunk).get();
-
-      posts.addAll(response.docs.map((e) => PostModel.fromMap(e.data())));
+  Future<UserModel?> getUserInfo(String userID) async {
+    try {
+      final userData = await _store.collection("users").doc(userID).get();
+      return UserModel.fromMap(userData.data() as Map<String, dynamic>);
+    } catch (e) {
+      return null;
     }
-
-    posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return posts;
-  }
-
-  Future<List<PostModel>> getAllPosts() async{
-    final response = await _store.collection("posts").get();
-    return response.docs.map((e)=>PostModel.fromMap(e.data())).toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-  }
-
-  Future<List<ReelModel>> getAllReels() async{
-    final response = await _store.collection("reels").get();
-    return response.docs.map((e)=>ReelModel.fromMap(e.data())).toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   Future<List<UserModel>> getFollows(String userID, String followType) async {
@@ -261,6 +211,56 @@ class UserProvider extends ChangeNotifier {
      showScaffoldMSG(context, "${"something_went_wrong".tr()} $e");
    }
  }
+
+  Future<List<PostModel>> getUserPosts(String userID) async {
+    final response = await _store.collection("posts").where("uid", isEqualTo: userID).get();
+    return response.docs.map((e) => PostModel.fromMap(e.data())).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  Future<List<ReelModel>> getUserReels(String userID) async {
+    final response = await _store.collection("reels").where("userId", isEqualTo: userID).get();
+    return response.docs.map((e) => ReelModel.fromMap(e.data())).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  Future<List<PostModel>> getLikedPosts(String userID) async {
+    final response = await _store.collection("posts").where("likes", arrayContains: userID).get();
+    return response.docs.map((e) => PostModel.fromMap(e.data())).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  Future<List<PostModel>> getSavedPosts(String userID) async {
+    final userDoc = await _store.collection("users").doc(userID).get();
+    List<String> savedPostIds = List<String>.from(userDoc.data()!["savedPosts"]);
+    if (savedPostIds.isEmpty) return [];
+
+    List<PostModel> posts = [];
+
+    // chunks of 10 (Firestore limit for whereIn)
+    for (var i = 0; i < savedPostIds.length; i += 10) {
+      final chunk = savedPostIds.sublist(i, i + 10 > savedPostIds.length ? savedPostIds.length : i + 10);
+      final response = await _store.collection("posts")
+          .where(FieldPath.documentId, whereIn: chunk).get();
+
+      posts.addAll(response.docs.map((e) => PostModel.fromMap(e.data())));
+    }
+
+    posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return posts;
+  }
+
+  Future<List<PostModel>> getAllPosts() async{
+    final response = await _store.collection("posts").get();
+    return response.docs.map((e)=>PostModel.fromMap(e.data())).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  Future<List<ReelModel>> getAllReels() async{
+    final response = await _store.collection("reels").get();
+    return response.docs.map((e)=>ReelModel.fromMap(e.data())).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
 
   String chatId(String userId) => currentUser!.uid.compareTo(userId) < 0 ?
   "${currentUser!.uid}\_$userId" : "$userId\_${currentUser!.uid}";
