@@ -162,7 +162,7 @@ class _PostWidgetState extends State<PostWidget> {
                             "assets/icons/${isLiked ? "like_filled" : "like"}.png"),
                           color: isLiked ? Colors.red : Theme.of(context).colorScheme.primary,
                         )),
-                    ImageIcon(AssetImage("assets/icons/comment.png")),
+                    InkWell(child: ImageIcon(AssetImage("assets/icons/comment.png"))),
                     IconButton(onPressed: (){}, icon: ImageIcon(AssetImage("assets/icons/share.png"))),
                     Spacer(),
                     IconButton(onPressed: (){
