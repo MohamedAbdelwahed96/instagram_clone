@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/core/controllers.dart';
 import '/data/user_model.dart';
 import '/logic/media_provider.dart';
 import '/logic/user_provider.dart';
@@ -22,12 +23,14 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController emailController = TextEditingController(),
-      passController = TextEditingController(),
-      ageController = TextEditingController(),
-      userNameController = TextEditingController(),
-      fullNameController = TextEditingController();
+  FormControllers formControllers = FormControllers();
   UserModel? userModel;
+
+  @override
+  void dispose() {
+    formControllers.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +38,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final screen = MediaQuery.of(context).size;
     return Consumer2<UserProvider, MediaProvider>(
         builder: (context, userProvider, mediaProvider, _){
-          bool isEnabled = (emailController.text.isNotEmpty
-              && passController.text.isNotEmpty
-              && userNameController.text.isNotEmpty
-              && fullNameController.text.isNotEmpty
+          bool isEnabled = (formControllers.email.text.isNotEmpty
+              && formControllers.password.text.isNotEmpty
+              && formControllers.username.text.isNotEmpty
+              && formControllers.name.text.isNotEmpty
               && mediaProvider.mediaFile!=null);
 
       return Scaffold(
@@ -51,12 +54,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   Image.asset("assets/images/Logo.png",
                     width: screen.width * 0.56,
-                    color: theme.primary,),
-                  TextFormfieldWidget(hintText: "email".tr(), controller: emailController,),
-                  TextFormfieldWidget(hintText: "password".tr(), controller: passController, obsecure: true),
-                  TextFormfieldWidget(hintText: "age".tr(), controller: ageController),
-                  TextFormfieldWidget(hintText: "username".tr(), controller: userNameController),
-                  TextFormfieldWidget(hintText: "full_name".tr(), controller: fullNameController),
+                    color: theme.primary),
+                  TextFormfieldWidget(hintText: "email".tr(), controller: formControllers.email,),
+                  TextFormfieldWidget(hintText: "password".tr(), controller: formControllers.password, obsecure: true),
+                  TextFormfieldWidget(hintText: "age".tr(), controller: formControllers.age),
+                  TextFormfieldWidget(hintText: "username".tr(), controller: formControllers.username),
+                  TextFormfieldWidget(hintText: "full_name".tr(), controller: formControllers.name),
                   InkWell(
                     onTap: ()=> mediaProvider.selectMedia(FileType.image),
                     child: Padding(
@@ -70,10 +73,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   InkWell(
                     onTap: !isEnabled ? null : () async {
                       await mediaProvider.uploadMedia(context, bucketName: "images", folder: "uploads");
-                      final email = emailController.text.trimRight(),
-                          pass = passController.text,
-                          userName = userNameController.text,
-                          fullName= fullNameController.text,
+                      final email = formControllers.email.text.trimRight(),
+                          pass = formControllers.password.text,
+                          userName = formControllers.username.text,
+                          fullName= formControllers.name.text,
                           pfpUrl=mediaProvider.filename;
                       await userProvider.signUp(context, UserModel(
                           username: userName,

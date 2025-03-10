@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 class FormControllers {
   final name = TextEditingController();
@@ -12,6 +11,7 @@ class FormControllers {
   final gender = TextEditingController();
   final search = TextEditingController();
   final message = TextEditingController();
+  final age = TextEditingController();
   final page = PageController();
   final caption = TextEditingController();
 
@@ -26,6 +26,7 @@ class FormControllers {
     gender.dispose();
     search.dispose();
     message.dispose();
+    age.dispose();
     page.dispose();
     caption.dispose();
   }
