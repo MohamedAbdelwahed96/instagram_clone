@@ -41,20 +41,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: SingleChildScrollView(
               child: Column(
-                // mainAxisAlignment: MainAxisAlignment.center,
                 spacing: screen.height*0.025,
                 children: [
                   Image.asset("assets/images/Logo.png",
                     width: screen.width * 0.56,
                     color: theme.primary,),
                   TextFormfieldWidget(hintText: "email".tr(), controller: emailController,),
-                  // SizedBox(height: 21),
                   TextFormfieldWidget(hintText: "password".tr(), controller: passController, obsecure: true),
-                  // SizedBox(height: 21),
                   TextFormfieldWidget(hintText: "age".tr(), controller: ageController),
-                  // SizedBox(height: 21),
                   TextFormfieldWidget(hintText: "username".tr(), controller: userNameController),
-                  // SizedBox(height: 21),
                   TextFormfieldWidget(hintText: "full_name".tr(), controller: fullNameController),
                   InkWell(
                     onTap: ()=> mediaProvider.selectMedia(FileType.image),
@@ -85,9 +80,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       userProvider.isLogged?Navigator.pushReplacement(context, CupertinoPageRoute(
                           builder: (context) => NavigationBotBar())):null;
                     },
-                    child: ButtonWidget(text: "register".tr()),
+                    child: ButtonWidget(text: "register".tr(),
+                      isEnabled: (emailController.text.isNotEmpty
+                          && passController.text.isNotEmpty
+                          && userNameController.text.isNotEmpty
+                          && fullNameController.text.isNotEmpty
+                          && mediaProvider.mediaFile!=null)),
                   ),
-                  // SizedBox(height: 21),
                   RichText(
                     text: TextSpan(
                       children: [
@@ -97,7 +96,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         TextSpan(
                           text: "login".tr(),
-                          style: TextStyle(fontWeight: FontWeight.bold, color: theme.primary),
+                          style: TextStyle(fontWeight: FontWeight.bold),
                           recognizer: TapGestureRecognizer()..onTap = () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen(),),),
                         ),
                       ],
