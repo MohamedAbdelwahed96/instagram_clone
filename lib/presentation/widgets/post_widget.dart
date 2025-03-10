@@ -51,11 +51,12 @@ class _PostWidgetState extends State<PostWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context).colorScheme;
+    if(img == null || postMedia == null) return SkeletonPostWidget();
+
     return Consumer2<MediaProvider, UserProvider>(
         builder: (context, mediaProvider, userProvider, child){
-            return img == null || postMedia!.isEmpty ? SkeletonPostWidget()
-                : Padding(
+          final theme = Theme.of(context).colorScheme;
+          return Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,7 +152,7 @@ class _PostWidgetState extends State<PostWidget> {
                     },
                         icon: ImageIcon(AssetImage(
                             "assets/icons/${isLiked ? "like_filled" : "like"}.png"),
-                          color: isLiked ? Colors.red : Theme.of(context).colorScheme.primary,
+                          color: isLiked ? Colors.red : theme.primary,
                         )),
                     InkWell(child: ImageIcon(AssetImage("assets/icons/comment.png"))),
                     IconButton(onPressed: (){}, icon: ImageIcon(AssetImage("assets/icons/share.png"))),
@@ -187,7 +188,8 @@ class _PostWidgetState extends State<PostWidget> {
                           ],
                         ),
                       ),
-                      Text(timeago.format(widget.post.createdAt), style: TextStyle(color: theme.primary.withOpacity(0.5)),)
+                      Text(timeago.format(widget.post.createdAt),
+                        style: TextStyle(color: theme.primary.withOpacity(0.5)),)
                     ],
                   ),
                 ),
