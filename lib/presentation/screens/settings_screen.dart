@@ -20,8 +20,9 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<UserProvider, ThemeProvider>(builder: (context, userProvider, themeProvider, _){
-      final theme = Theme.of(context).colorScheme;
+    return Consumer2<UserProvider, ThemeProvider>(
+        builder: (context, userProvider, themeProvider, _){
+          final theme = Theme.of(context).colorScheme;
 
       return Scaffold(
         appBar: AppBar(

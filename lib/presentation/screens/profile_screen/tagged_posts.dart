@@ -11,6 +11,7 @@ class TaggedPosts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final thisUser = Provider.of<UserProvider>(context).currentUser!.uid;
+    final theme = Theme.of(context).colorScheme;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -18,11 +19,11 @@ class TaggedPosts extends StatelessWidget {
           radius: 65,
           child: CircleAvatar(
             radius: 60,
-            backgroundColor: Theme.of(context).colorScheme.surface,
+            backgroundColor: theme.surface,
             child: Icon(
               Icons.person_pin_outlined,
               size: 80,
-              color: Theme.of(context).colorScheme.primary,
+              color: theme.primary,
             ),
           ),
         ),
@@ -41,7 +42,7 @@ class TaggedPosts extends StatelessWidget {
               TextSpan(
                 text: "tagged_desc".tr(),
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400,
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.5))
+                    color: theme.primary.withOpacity(0.5))
               )
             ]
           ),

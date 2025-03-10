@@ -35,6 +35,7 @@ class _EditTextFormfieldWidgetState extends State<EditTextFormfieldWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -54,7 +55,7 @@ class _EditTextFormfieldWidgetState extends State<EditTextFormfieldWidget> {
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton(
-                            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                            style: TextStyle(color: theme.primary),
                             items: [
                               DropdownMenuItem(value: "Male", child: Text("male".tr())),
                               DropdownMenuItem(value: "Female", child: Text("female".tr()))
@@ -74,13 +75,13 @@ class _EditTextFormfieldWidgetState extends State<EditTextFormfieldWidget> {
                     keyboardType: widget.keyboardType,
                     inputFormatters: widget.inputFormats,
                     maxLines: widget.maxLines,
-                    style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                    style: TextStyle(color: theme.primary),
                     decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.transparent),),
                     ),
                   ),
-                  widget.lineEnabled?Container(height: 1, color: Theme.of(context).colorScheme.primary.withOpacity(0.15)):SizedBox()
+                  widget.lineEnabled?Container(height: 1, color: theme.primary.withOpacity(0.15)):SizedBox()
                 ],
               )),
         ],

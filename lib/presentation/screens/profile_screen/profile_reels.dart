@@ -47,7 +47,7 @@ class _ProfileReelsState extends State<ProfileReels> {
   @override
   Widget build(BuildContext context) {
     if (_reels == null || _videoUrl == null) return SkeletonProfilePost();
-
+    final theme = Theme.of(context).colorScheme;
     return _reels!.isNotEmpty
         ? GridView.builder(
       physics: BouncingScrollPhysics(),
@@ -86,11 +86,11 @@ class _ProfileReelsState extends State<ProfileReels> {
           radius: 65,
           child: CircleAvatar(
             radius: 60,
-            backgroundColor: Theme.of(context).colorScheme.surface,
+            backgroundColor: theme.surface,
             child: Icon(
               Icons.photo_camera_outlined,
               size: 80,
-              color: Theme.of(context).colorScheme.primary,
+              color: theme.primary,
             ),
           ),
         ),

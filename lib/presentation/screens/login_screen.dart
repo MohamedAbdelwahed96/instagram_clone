@@ -28,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -37,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Image.asset("assets/images/Logo.png",
                 width: MediaQuery.of(context).size.width*0.56,
-                color: Theme.of(context).colorScheme.primary,),
+                color: theme.primary,),
               TextFormfieldWidget(hintText: "email".tr(), controller: formControllers.email),
               SizedBox(height: 21),
               TextFormfieldWidget(hintText: "password".tr(), controller: formControllers.password, obsecure: true),
@@ -58,11 +59,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     TextSpan(
                       text: "do_not_have_an_email".tr(),
-                      style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13, color: Theme.of(context).colorScheme.secondary),
+                      style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13, color: theme.secondary),
                     ),
                     TextSpan(
                       text: "register".tr(),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: theme.primary),
                       recognizer: TapGestureRecognizer()..onTap = () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignUpScreen(),),),
                     ),
                   ],

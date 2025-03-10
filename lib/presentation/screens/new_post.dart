@@ -85,11 +85,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   child: Container(
                     height: MediaQuery.of(context).size.height*0.3,
                     width: MediaQuery.of(context).size.width,
-                    color: Theme.of(context).colorScheme.inversePrimary,
+                    color: theme.inversePrimary,
                     child: provider.mediaFiles.isEmpty ? Center(
                           child: IconButton(
                           onPressed: ()async => await provider.selectMedia(FileType.media, multiple: true),
-                          icon: Icon(Icons.add_a_photo, size: 50, color: Theme.of(context).colorScheme.secondary)),
+                          icon: Icon(Icons.add_a_photo, size: 50, color: theme.secondary)),
                         ) :
                     PageView.builder(
                         controller: formControllers.page,

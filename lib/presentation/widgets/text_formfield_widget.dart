@@ -14,18 +14,19 @@ class TextFormfieldWidget extends StatefulWidget {
 class _TextFormfieldWidgetState extends State<TextFormfieldWidget> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
     return TextFormField(
       controller: widget.controller,
-      style: TextStyle(color: Theme.of(context).colorScheme.primary),
+      style: TextStyle(color: theme.primary),
       obscureText: widget.obsecure,
       decoration: InputDecoration(
         filled: true,
-        fillColor: Theme.of(context).colorScheme.inversePrimary,
+        fillColor: theme.inversePrimary,
         hintText: widget.hintText,
         hintStyle: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w400,
-            color: Theme.of(context).colorScheme.secondary),
+            color: theme.secondary),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.transparent),

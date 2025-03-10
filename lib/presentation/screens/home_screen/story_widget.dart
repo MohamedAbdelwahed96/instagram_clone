@@ -36,6 +36,7 @@ class _StoryWidgetState extends State<StoryWidget> {
   Widget build(BuildContext context) {
     if (fetchedStories == null) return SizedBox.shrink();
     final screen = MediaQuery.of(context).size;
+    final theme = Theme.of(context).colorScheme;
     return SizedBox(
       height: screen.width * 0.22,
       child: ListView.builder(
@@ -62,7 +63,7 @@ class _StoryWidgetState extends State<StoryWidget> {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Theme.of(context).colorScheme.surface),
+                        color: theme.surface),
                       padding: EdgeInsets.all(3),
                       child: CircleAvatar(
                         radius: screen.width * 0.08,
@@ -78,7 +79,7 @@ class _StoryWidgetState extends State<StoryWidget> {
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewStory())),
                         child: CircleAvatar(
                           radius: screen.width * 0.036,
-                          backgroundColor: Theme.of(context).colorScheme.surface,
+                          backgroundColor: theme.surface,
                           child: CircleAvatar(
                             radius: screen.width * 0.03,
                             backgroundColor: Colors.blue,

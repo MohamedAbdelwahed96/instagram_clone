@@ -54,7 +54,7 @@ class _PostWidgetState extends State<PostWidget> {
     if(img == null || postMedia == null) return SkeletonPostWidget();
 
     return Consumer2<MediaProvider, UserProvider>(
-        builder: (context, mediaProvider, userProvider, child){
+        builder: (context, mediaProvider, userProvider, _){
           final theme = Theme.of(context).colorScheme;
           return Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),

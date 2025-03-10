@@ -48,7 +48,7 @@ class _LikedPostsState extends State<LikedPosts> {
   @override
   Widget build(BuildContext context) {
     if (_posts == null || _mediaUrls == null) return SkeletonProfilePost();
-
+    final theme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text("favorite".tr()),
@@ -95,11 +95,11 @@ class _LikedPostsState extends State<LikedPosts> {
             radius: 65,
             child: CircleAvatar(
               radius: 60,
-              backgroundColor: Theme.of(context).colorScheme.surface,
+              backgroundColor: theme.surface,
               child: Icon(
                 Icons.photo_camera_outlined,
                 size: 80,
-                color: Theme.of(context).colorScheme.primary,
+                color: theme.primary,
               ),
             ),
           ),

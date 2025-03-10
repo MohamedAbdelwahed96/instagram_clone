@@ -31,6 +31,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
     return Consumer2<UserProvider, MediaProvider>(
         builder: (context, userProvider, mediaProvider, _){
       return Scaffold(
@@ -43,7 +44,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   Image.asset("assets/images/Logo.png",
                     width: MediaQuery.of(context).size.width * 0.56,
-                    color: Theme.of(context).colorScheme.primary,),
+                    color: theme.primary,),
                   TextFormfieldWidget(hintText: "email".tr(), controller: emailController,),
                   SizedBox(height: 21),
                   TextFormfieldWidget(hintText: "password".tr(), controller: passController, obsecure: true),
@@ -58,9 +59,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 21),
                       child: CircleAvatar(radius: 60,
-                          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                          backgroundColor: theme.inversePrimary,
                           foregroundImage: mediaProvider.mediaFile==null?null:FileImage(File(mediaProvider.mediaFile!.path!)),
-                          child: Image.asset("assets/icons/pfp.png", color: Theme.of(context).colorScheme.primary)),
+                          child: Image.asset("assets/icons/pfp.png", color: theme.primary)),
                     ),
                   ),
                   InkWell(
@@ -90,11 +91,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       children: [
                         TextSpan(
                           text: "already_have_an_email".tr(),
-                          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13, color: Theme.of(context).colorScheme.secondary),
+                          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13, color: theme.secondary),
                         ),
                         TextSpan(
                           text: "login".tr(),
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                          style: TextStyle(fontWeight: FontWeight.bold, color: theme.primary),
                           recognizer: TapGestureRecognizer()..onTap = () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen(),),),
                         ),
                       ],

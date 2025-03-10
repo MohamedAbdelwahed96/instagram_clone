@@ -47,7 +47,7 @@ class _SavedPostsState extends State<SavedPosts> {
   @override
   Widget build(BuildContext context) {
     if (_posts == null || _mediaUrls == null) return Center(child: CircularProgressIndicator());
-
+    final theme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text("saved".tr())),
       body: _posts!.isNotEmpty
@@ -91,11 +91,11 @@ class _SavedPostsState extends State<SavedPosts> {
             radius: 65,
             child: CircleAvatar(
               radius: 60,
-              backgroundColor: Theme.of(context).colorScheme.surface,
+              backgroundColor: theme.surface,
               child: Icon(
                 Icons.photo_camera_outlined,
                 size: 80,
-                color: Theme.of(context).colorScheme.primary,
+                color: theme.primary,
               ),
             ),
           ),
