@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Image.asset("assets/images/Logo.png",
                 width: MediaQuery.of(context).size.width*0.56,
-                color: theme.primary,),
+                color: theme.primary),
               TextFormfieldWidget(hintText: "email".tr(), controller: formControllers.email),
               SizedBox(height: 21),
               TextFormfieldWidget(hintText: "password".tr(), controller: formControllers.password, obsecure: true),
@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     TextSpan(
                       text: "register".tr(),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: theme.primary),
+                      style: TextStyle(fontWeight: FontWeight.bold),
                       recognizer: TapGestureRecognizer()..onTap = () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignUpScreen(),),),
                     ),
                   ],

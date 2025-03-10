@@ -35,9 +35,8 @@ class _NavigationBotBarState extends State<NavigationBotBar> {
     final userProvider =  Provider.of<UserProvider>(context, listen: false);
     final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
     UserModel? fetchedUser = await userProvider.getUserInfo(userProvider.currentUser!.uid);
-    String? pfp = fetchedUser != null ?
-    await mediaProvider.getImage(bucketName: "images", folderName: "uploads", fileName: fetchedUser.pfpUrl)
-        : null;
+    String? pfp = fetchedUser == null ? null :
+    await mediaProvider.getImage(bucketName: "images", folderName: "uploads", fileName: fetchedUser.pfpUrl);
     setState(() {
       user = fetchedUser;
       img = pfp;
@@ -51,10 +50,10 @@ class _NavigationBotBarState extends State<NavigationBotBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MediaProvider>(builder: (context, provider, _){
-      if (img == null || user == null) return Center(child: CircularProgressIndicator());
-      final theme = Theme.of(context).colorScheme;
+    if (img == null || user == null) return Center(child: CircularProgressIndicator());
 
+    return Consumer<MediaProvider>(builder: (context, provider, _){
+      final theme = Theme.of(context).colorScheme;
       return Scaffold(
         body: PageView(
             controller: _pageController,
