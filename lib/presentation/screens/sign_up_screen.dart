@@ -35,6 +35,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final screen = MediaQuery.of(context).size;
     return Consumer2<UserProvider, MediaProvider>(
         builder: (context, userProvider, mediaProvider, _){
+          bool isEnabled = (emailController.text.isNotEmpty
+              && passController.text.isNotEmpty
+              && userNameController.text.isNotEmpty
+              && fullNameController.text.isNotEmpty
+              && mediaProvider.mediaFile!=null);
+
       return Scaffold(
         body: SafeArea(
           child: Padding(
@@ -62,7 +68,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () async{
+                    onTap: !isEnabled ? null : () async {
                       await mediaProvider.uploadMedia(context, bucketName: "images", folder: "uploads");
                       final email = emailController.text.trimRight(),
                           pass = passController.text,
@@ -81,11 +87,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           builder: (context) => NavigationBotBar())):null;
                     },
                     child: ButtonWidget(text: "register".tr(),
-                      isEnabled: (emailController.text.isNotEmpty
-                          && passController.text.isNotEmpty
-                          && userNameController.text.isNotEmpty
-                          && fullNameController.text.isNotEmpty
-                          && mediaProvider.mediaFile!=null)),
+                      isEnabled: isEnabled),
                   ),
                   RichText(
                     text: TextSpan(
