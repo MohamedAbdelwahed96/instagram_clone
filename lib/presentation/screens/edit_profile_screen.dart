@@ -36,8 +36,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         await userProvider.getUserInfo(userProvider.currentUser!.uid);
     String? profilePicture = fetchedUser != null
         ? await Provider.of<MediaProvider>(context, listen: false).getImage(
-            bucketName: "images",
-            folderName: "uploads",
+            bucketName: "users",
+            folderName: fetchedUser.uid,
             fileName: fetchedUser.pfpUrl)
         : null;
     setState(() {
@@ -100,7 +100,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                   if (mediaProvider.mediaFile != null) {
                     await mediaProvider.uploadMedia(context,
-                        bucketName: "images", folder: "uploads");
+                        bucketName: "users", folder: user!.uid);
                     pfpUrl = mediaProvider.filename ?? pfpUrl;
                   }
 
