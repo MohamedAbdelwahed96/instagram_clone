@@ -72,25 +72,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   InkWell(
                     onTap: !isEnabled ? null : () async {
-                      await mediaProvider.uploadMedia(context, bucketName: "images", folder: "uploads");
-                      final email = formControllers.email.text.trimRight(),
-                          pass = formControllers.password.text,
-                          userName = formControllers.username.text,
-                          fullName= formControllers.name.text,
-                          pfpUrl=mediaProvider.filename;
-                      await userProvider.signUp(context, UserModel(
-                          username: userName,
-                          fullName: fullName,
-                          email: email,
-                          gender: "Male",
-                          pfpUrl: pfpUrl!,
-                          time: DateTime.now()),
+                      final email = formControllers.email.text.trimRight();
+                      final pass = formControllers.password.text;
+                      final userName = formControllers.username.text;
+                      final fullName= formControllers.name.text;
+
+                      await userProvider.signUp(context,
+                          UserModel(username: userName, fullName: fullName, email: email, time: DateTime.now()),
                           pass);
-                      userProvider.isLogged?Navigator.pushReplacement(context, CupertinoPageRoute(
-                          builder: (context) => NavigationBotBar())):null;
+
+                      if (userProvider.isLogged) {
+                        Navigator.pushReplacement(context, CupertinoPageRoute(
+                            builder: (context) => NavigationBotBar()));
+                      }
                     },
-                    child: ButtonWidget(text: "register".tr(),
-                      isEnabled: isEnabled),
+                    child: ButtonWidget(text: "register".tr(), isEnabled: isEnabled),
                   ),
                   RichText(
                     text: TextSpan(

@@ -34,7 +34,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
 
     for (var user in fetchedUsers) {
       String? profilePic = await mediaProvider.getImage(
-          bucketName: "images", folderName: "uploads", fileName: user.pfpUrl);
+          bucketName: "users", folderName: user.uid, fileName: user.pfpUrl);
       fetchedImages.add(profilePic);
     }
 

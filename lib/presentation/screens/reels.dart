@@ -40,7 +40,7 @@ class _ReelsState extends State<Reels> {
     bool follow = await userProvider.checkFollow(widget.reel.userId);
 
     final fetchedUser = await userProvider.getUserInfo(widget.reel.userId);
-    final pfp = await mediaProvider.getImage(bucketName: "images", folderName: "uploads", fileName: fetchedUser!.pfpUrl);
+    final pfp = await mediaProvider.getImage(bucketName: "users", folderName: fetchedUser!.uid, fileName: fetchedUser.pfpUrl);
     final video = await mediaProvider.getImage(bucketName: "reels", folderName: widget.reel.reelId, fileName: widget.reel.videoUrl);
 
     bool like = await userProvider.checkLike(mediaType: "reels", mediaID: widget.reel.reelId);

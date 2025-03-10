@@ -24,7 +24,7 @@ String? userImg;
 
   void fetchData() async {
     String? firstImg = await Provider.of<MediaProvider>(context, listen: false)
-        .getImage(bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
+        .getImage(bucketName: "users", folderName: widget.user.uid, fileName: widget.user.pfpUrl);
     setState(() => userImg = firstImg);
   }
 

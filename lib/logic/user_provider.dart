@@ -5,6 +5,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/data/reel_model.dart';
 import 'package:instagram_clone/data/story_model.dart';
+import 'package:instagram_clone/logic/media_provider.dart';
+import 'package:provider/provider.dart';
 import '/data/post_model.dart';
 import '/data/user_model.dart';
 import 'package:instagram_clone/core/dialogs.dart';
@@ -20,12 +22,15 @@ class UserProvider extends ChangeNotifier {
 
   Future signUp(context, UserModel user, String password) async {
     try{
+      final media = Provider.of<MediaProvider>(context, listen: false);
       UserCredential userCd = await _auth.createUserWithEmailAndPassword(email: user.email, password: password);
+      await media.uploadMedia(context, bucketName: "users", folder: userCd.user!.uid);
       String? token = await _msg.getToken();
       await _store.collection("users").doc(userCd.user!.uid).set(user.toMap());
       await _store.collection("users").doc(userCd.user!.uid).update({
         "uid":userCd.user!.uid,
-        "fcmToken":token
+        "fcmToken":token,
+        "pfpUrl":media.filename
       });
       showScaffoldMSG(context, "created_successfully");
       _isLogged=true;

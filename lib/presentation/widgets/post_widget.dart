@@ -37,7 +37,7 @@ class _PostWidgetState extends State<PostWidget> {
     final user = Provider.of<UserProvider>(context, listen: false);
     final media = Provider.of<MediaProvider>(context, listen: false);
     UserModel? userModel = await user.getUserInfo(widget.post.uid);
-    String profilePicture = await media.getImage(bucketName: "images", folderName: "uploads", fileName: userModel!.pfpUrl);
+    String profilePicture = await media.getImage(bucketName: "users", folderName: widget.post.uid, fileName: userModel!.pfpUrl);
     List<String> imgs = await media.getImages(bucketName: "posts", folderName: widget.post.postId);
     bool like = await user.checkLike(mediaType: "posts", mediaID: widget.post.postId);
     bool save = await user.checkSave(mediaType: "Posts", mediaID: widget.post.postId);

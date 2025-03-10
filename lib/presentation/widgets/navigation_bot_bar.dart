@@ -36,7 +36,7 @@ class _NavigationBotBarState extends State<NavigationBotBar> {
     final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
     UserModel? fetchedUser = await userProvider.getUserInfo(userProvider.currentUser!.uid);
     String? pfp = fetchedUser == null ? null :
-    await mediaProvider.getImage(bucketName: "images", folderName: "uploads", fileName: fetchedUser.pfpUrl);
+    await mediaProvider.getImage(bucketName: "users", folderName: fetchedUser.uid, fileName: fetchedUser.pfpUrl);
     setState(() {
       user = fetchedUser;
       img = pfp;

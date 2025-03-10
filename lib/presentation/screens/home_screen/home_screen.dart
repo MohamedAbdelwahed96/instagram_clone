@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     List<String> fetchedPfpUrls = await Future.wait(
       fetchedUsers.map((user) => Provider.of<MediaProvider>(context, listen: false).getImage(
-        bucketName: "images", folderName: "uploads", fileName: user.pfpUrl),
+        bucketName: "users", folderName: user.uid, fileName: user.pfpUrl),
       ),
     );
 

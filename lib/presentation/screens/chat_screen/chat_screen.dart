@@ -37,7 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void fetchData() async {
     await Provider.of<ChatProvider>(context, listen: false).getMessages(widget.chatId);
     String? profilePicture = await Provider.of<MediaProvider>(context, listen: false)
-        .getImage(bucketName: "images", folderName: "uploads", fileName: widget.user!.pfpUrl);
+        .getImage(bucketName: "users", folderName: widget.user!.uid, fileName: widget.user!.pfpUrl);
     setState(() => userImg = profilePicture);
   }
 

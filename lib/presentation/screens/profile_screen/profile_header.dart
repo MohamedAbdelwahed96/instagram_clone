@@ -30,7 +30,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
   void fetchData() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     String? profilePicture = await Provider.of<MediaProvider>(context, listen: false)
-        .getImage(bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
+        .getImage(bucketName: "users", folderName: widget.user.uid, fileName: widget.user.pfpUrl);
     bool follow = await userProvider.checkFollow(widget.user.uid);
     setState(() {
       img = profilePicture;

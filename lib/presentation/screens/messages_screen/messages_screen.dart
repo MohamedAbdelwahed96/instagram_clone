@@ -44,7 +44,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       UserModel? user = await userProvider.getUserInfo(userId);
       if (user != null) {
         String? profilePic = await mediaProvider.getImage(
-          bucketName: "images", folderName: "uploads", fileName: user.pfpUrl);
+          bucketName: "users", folderName: user.uid, fileName: user.pfpUrl);
 
         fetchedUsers.add(user);
         fetchedImages.add(profilePic);

@@ -39,7 +39,7 @@ class _StoryScreenState extends State<StoryScreen> {
 
     final fetchedStories = await userProvider.getRecentStories(widget.user.uid);
     final profilePic = await mediaProvider.getImage(
-        bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
+        bucketName: "users", folderName: widget.user.uid, fileName: widget.user.pfpUrl);
 
     final storyMediaUrls = await Future.wait(
       fetchedStories.map((story) => mediaProvider.getImage(

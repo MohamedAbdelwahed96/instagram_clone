@@ -29,7 +29,7 @@ class _ContactsState extends State<Contacts> {
     final mediaProvider = Provider.of<MediaProvider>(context, listen: false);
 
     final image = await mediaProvider.getImage(
-        bucketName: "images", folderName: "uploads", fileName: widget.user.pfpUrl);
+        bucketName: "users", folderName: widget.user.uid, fileName: widget.user.pfpUrl);
     bool follow = await userProvider.checkFollow(widget.user.uid);
 
     setState(() {
